@@ -255,12 +255,22 @@ public class Request
 	 * Returns the byte array underlying the Netty ByteBuf for this request.
 	 * However, if the ByteBuf returns false to hasArray(), this
 	 * method returns null.
+	 * @author actolap All ByteBufs may not have backing array (i.e. direct memory)
 	 * 
 	 * @return an array of byte, or null, if the ByteBuf is not backed by a byte array.
 	 */
 	public byte[] getBodyAsBytes()
 	{
-		return (getBody().hasArray() ? getBody().array() : null);
+		ByteBuf buf = getBody();
+		int length = buf.readableBytes();
+		byte[] bytes;
+		if (buf.hasArray()) {
+			bytes = buf.array();
+		} else {
+			bytes = new byte[length];
+			buf.getBytes(buf.readerIndex(), bytes);
+		}
+		return bytes;
 	}
 
 	/**

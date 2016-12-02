@@ -264,12 +264,17 @@ public class Request
 		ByteBuf buf = getBody();
 		int length = buf.readableBytes();
 		byte[] bytes;
-		if (buf.hasArray()) {
+
+		if (buf.hasArray())
+		{
 			bytes = buf.array();
-		} else {
+		}
+		else
+		{
 			bytes = new byte[length];
 			buf.getBytes(buf.readerIndex(), bytes);
 		}
+
 		return bytes;
 	}
 

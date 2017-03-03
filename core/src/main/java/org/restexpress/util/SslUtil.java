@@ -1,5 +1,6 @@
 package org.restexpress.util;
 
+import java.util.Arrays;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -24,11 +25,14 @@ public class SslUtil
 			kmf.init(ks, keyPassword);
 
 			SSLContext context = SSLContext.getInstance("TLS");
-			context.init(kmf.getKeyManagers(), null, null);
+			context.init(kmf.getKeyManagers(), null, null);			
 			return context;
 		}
 		finally
 		{
+			//Arrays.fill(filePassword,'0');
+			//Arrays.fill(keyPassword,'0');
+			
 			if (null != fin)
 			{
 				try

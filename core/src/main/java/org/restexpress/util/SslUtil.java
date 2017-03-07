@@ -29,10 +29,7 @@ public class SslUtil
 			return context;
 		}
 		finally
-		{
-			//Arrays.fill(filePassword,'0');
-			//Arrays.fill(keyPassword,'0');
-			
+		{			
 			if (null != fin)
 			{
 				try

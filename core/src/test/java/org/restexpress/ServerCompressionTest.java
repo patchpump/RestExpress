@@ -19,7 +19,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -63,7 +62,7 @@ public class ServerCompressionTest
 
 	@Before
 	public void ensureServerRunning()
-	throws InterruptedException
+	throws Throwable
 	{
 		if (SERVER == null)
 		{

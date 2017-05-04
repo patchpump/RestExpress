@@ -16,18 +16,6 @@
  */
 package org.restexpress;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.ChannelGroupFuture;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.DefaultEventExecutorGroup;
-import io.netty.util.concurrent.EventExecutorGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
-
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,6 +49,20 @@ import org.restexpress.settings.ServerSettings;
 import org.restexpress.settings.SocketSettings;
 import org.restexpress.util.Callback;
 import org.restexpress.util.DefaultShutdownHook;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.ChannelGroupFuture;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
+import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.GlobalEventExecutor;
 
 /**
  * Primary entry point to create a RestExpress service. All that's required is a
@@ -612,6 +614,7 @@ public class RestExpress
 	}
 
 	public Channel bind()
+	throws Throwable
 	{
 		return bind((getPort() > 0 ? getPort() : DEFAULT_PORT));
 	}
@@ -649,6 +652,7 @@ public class RestExpress
 	 * @return Channel
 	 */
 	public Channel bind(int port)
+	throws Throwable
 	{
 		setPort(port);
 
@@ -668,12 +672,14 @@ public class RestExpress
 	 * @return
 	 */
 	public Channel bind(String hostname, int port)
+	throws Throwable
 	{
 		setPort(port);
 		return bind(new InetSocketAddress(hostname, port));
 	}
 
 	public Channel bind(InetSocketAddress ipAddress)
+	throws Throwable
 	{
 		ServerBootstrap bootstrap = bootstrapFactory.newServerBootstrap(getIoThreadCount());
 		bootstrap.childHandler(new PipelineInitializer()
@@ -691,11 +697,27 @@ public class RestExpress
 			System.out.println(getName() + " server listening on port " + ipAddress.toString());
 		}
 
-		Channel channel = bootstrap.bind(ipAddress).channel();
-		allChannels.add(channel);
+		ChannelFuture channelFuture = bootstrap.bind(ipAddress);
+		channelFuture.addListener(new GenericFutureListener<ChannelFuture>()
+		{
+			@Override
+			public void operationComplete(ChannelFuture future)
+			throws Exception
+			{
+				allChannels.add(future.channel());
+			}
+		});
 
+		channelFuture.awaitUninterruptibly();
+
+		if (!channelFuture.isSuccess())
+		{
+			throw channelFuture.cause();
+		}
+
+		// Connection established successfully
 		bindPlugins();
-		return channel;
+		return channelFuture.channel();
 	}
 
 	private EventExecutorGroup initializeExecutorGroup()

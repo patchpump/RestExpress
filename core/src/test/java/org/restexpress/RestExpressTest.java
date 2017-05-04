@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
+import java.net.BindException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -67,9 +68,26 @@ public class RestExpressTest
 		assertFalse(re.shouldUseSystemOut());
 	}
 
+	@Test(expected=BindException.class)
+	public void shouldThrowOnPortInUse()
+	throws Throwable
+	{
+		int port = nextPort();
+		RestExpress re = new RestExpress();
+		NoopController controller = new NoopController();
+		re.uri(TEST_PATH, controller);
+		re.bind(port);
+
+		waitForStartup();
+
+		RestExpress re2 = new RestExpress();
+		re2.uri(TEST_PATH, controller);
+		re2.bind(port);
+	}
+
 	@Test
 	public void shouldCallDefaultMethods()
-	throws ClientProtocolException, IOException
+	throws Throwable
 	{
 		int port = nextPort();
 		String testUrl = createUrl(TEST_URL_PATTERN, port);
@@ -168,7 +186,7 @@ public class RestExpressTest
 
 	@Test
 	public void shouldCallAltMethods()
-	throws ClientProtocolException, IOException
+	throws Throwable
 	{
 		int port = nextPort();
 		String testUrl = createUrl(TEST_URL_PATTERN, port);
@@ -250,7 +268,7 @@ public class RestExpressTest
 
 	@Test
 	public void shouldCallAltNamedMethods()
-	throws ClientProtocolException, IOException
+	throws Throwable
 	{
 		int port = nextPort();
 		String testUrl = createUrl(TEST_URL_PATTERN, port);
@@ -322,7 +340,7 @@ public class RestExpressTest
 
 	@Test
 	public void shouldSetOutputMediaType()
-	throws ClientProtocolException, IOException
+	throws Throwable
 	{
 		int port = nextPort();
 		String testUrl = createUrl(TEST_URL_PATTERN, port);
@@ -390,6 +408,7 @@ public class RestExpressTest
 
 	@Test(expected=NoRoutesDefinedException.class)
 	public void shouldThrowNoRoutesDefinedException()
+	throws Throwable
 	{
 		RestExpress re = null;
 

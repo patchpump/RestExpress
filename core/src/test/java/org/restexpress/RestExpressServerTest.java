@@ -127,7 +127,7 @@ public class RestExpressServerTest
 
 	@Before
 	public void ensureServerRunning()
-	throws InterruptedException
+	throws Throwable
 	{
 		if (SERVER == null)
 		{
@@ -153,7 +153,8 @@ public class RestExpressServerTest
 	// SECTION: TESTS
 
 	@Test
-	public void shouldHandleGetRequests() throws Exception
+	public void shouldHandleGetRequests()
+	throws Exception
 	{
 		HttpGet request = new HttpGet(URL1_PLAIN);
 

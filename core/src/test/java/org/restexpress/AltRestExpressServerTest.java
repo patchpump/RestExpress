@@ -131,7 +131,7 @@ public class AltRestExpressServerTest
 
 	@Before
 	public void ensureServerRunning()
-	throws InterruptedException
+	throws Throwable
 	{
 		POSTPROCESSOR.resetCallCount();
 		ERROR_PREPROCESSOR.shouldThrow(false);

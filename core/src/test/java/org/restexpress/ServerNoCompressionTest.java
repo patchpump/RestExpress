@@ -63,7 +63,7 @@ public class ServerNoCompressionTest
 
 	@Before
 	public void ensureServerRunning()
-	throws InterruptedException
+	throws Throwable
 	{
 		if (SERVER == null)
 		{

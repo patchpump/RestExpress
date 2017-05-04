@@ -96,6 +96,7 @@ public class AltRestExpressServerTest
 	public RestExpress createServer()
 	{
 		RestExpress server = new RestExpress();
+		server.setReadTimeoutSeconds(1);
 		RestExpress.setDefaultSerializationProvider(DEFAULT_SERIALIZER);
 		StringTestController stringTestController = new StringTestController();
 		ObjectTestController objectTestController = new ObjectTestController();

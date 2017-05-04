@@ -5,6 +5,7 @@ package org.restexpress.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
@@ -18,6 +19,7 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.concurrent.EventExecutorGroup;
 
 /**
@@ -40,6 +42,8 @@ extends ChannelInitializer<SocketChannel>
 	private EventExecutorGroup eventExecutorGroup = null;
 	private SslContext sslContext = null;
 	private boolean useCompression = true;
+	private long readTimeout = -1L;
+	private TimeUnit readTimeoutUnit = TimeUnit.SECONDS;
 
 	// SECTION: CONSTRUCTORS
 
@@ -87,6 +91,13 @@ extends ChannelInitializer<SocketChannel>
 		return this;
 	}
 
+	public PipelineInitializer setReadTimeout(long timeout, TimeUnit timeUnit)
+	{
+		this.readTimeout = timeout;
+		this.readTimeoutUnit = TimeUnit.SECONDS;
+		return this;
+	}
+
 	public SslContext getSSLContext()
 	{
 		return sslContext;
@@ -105,6 +116,12 @@ extends ChannelInitializer<SocketChannel>
 		}
 
 		// Inbound handlers
+
+		if (readTimeout > 0)
+		{
+			pipeline.addLast("timeout", new ReadTimeoutHandler(readTimeout, readTimeoutUnit));
+		}
+
 		pipeline.addLast("decoder", new HttpRequestDecoder());
 		pipeline.addLast("inflater", new HttpContentDecompressor());
 

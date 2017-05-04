@@ -15,6 +15,8 @@
  */
 package org.restexpress.settings;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author toddf
  * @since May 31, 2012
@@ -31,6 +33,8 @@ public class ServerSettings
 	private boolean keepAlive = true;
 	private boolean reuseAddress = true;
 	private int maxContentSize = DEFAULT_MAX_CONTENT_SIZE;
+	private long readTimeout = -1L;
+	private TimeUnit readTimeoutUnit = TimeUnit.SECONDS;
 
 	// This controls the number of concurrent connections the application can
 	// handle.
@@ -138,5 +142,26 @@ public class ServerSettings
 	public boolean shouldUseCompression()
 	{
 		return useCompression;
+	}
+
+	public long getReadTimeout()
+	{
+		return readTimeout;
+	}
+
+	public TimeUnit getReadTimeoutUnit()
+	{
+		return readTimeoutUnit;
+	}
+
+	public void setReadTimeoutSeconds(int timeoutSeconds)
+	{
+		setReadTimeoutSeconds(timeoutSeconds, TimeUnit.SECONDS);
+	}
+
+	public void setReadTimeoutSeconds(long timeout, TimeUnit unit)
+	{
+		this.readTimeout = timeout;
+		this.readTimeoutUnit = unit;
 	}
 }

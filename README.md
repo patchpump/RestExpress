@@ -80,6 +80,7 @@ Release 0.12.0-SNAPSHOT (in master)
 * Issue #126 - Introduced RestExpress.noCompression() to turn off response GZip and deflate encoding support (the Netty HttpContentCompressor is not put in the pipeline) for speed optimization (e.g. for small payloads).
 * Issue #130 - Throw on BindException.
 * Issues #137-138 - Use char[] vs String in SslUtil (Merge request from albahrani).
+* Issue #131 - RestExpress.setReadTimeoutSeconds(int seconds) or setReadTimeout(long, TimeUnit) now causes RestExpress to inject a ReadTimeoutHandler into the pipeline.
 * Upgraded Jackson Databind to 2.7.4
 * Upgraded Netty to 4.1.10.Final
 * Upgraded Xstream to 1.4.9

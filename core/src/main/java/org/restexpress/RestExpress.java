@@ -601,6 +601,12 @@ public class RestExpress
 		return this;
 	}
 
+	public RestExpress setReadTimeoutSeconds(int timeoutSeconds)
+	{
+		serverSettings.setReadTimeoutSeconds(timeoutSeconds);
+		return this;
+	}
+
 	/**
 	 * Can be called after routes are defined to augment or get data from
 	 * all the currently-defined routes.
@@ -686,6 +692,7 @@ public class RestExpress
 		    .addRequestHandler(buildRequestHandler())
 		    .setSSLContext(sslContext)
 		    .setMaxContentLength(serverSettings.getMaxContentSize())
+		    .setReadTimeout(serverSettings.getReadTimeout(), serverSettings.getReadTimeoutUnit())
 		    .setUseCompression(serverSettings.shouldUseCompression()));
 
 		setBootstrapOptions(bootstrap);

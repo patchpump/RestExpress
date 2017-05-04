@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.SSLContext;
-
 import org.restexpress.domain.metadata.RouteMetadata;
 import org.restexpress.domain.metadata.ServerMetadata;
 import org.restexpress.exception.DefaultExceptionMapper;
@@ -59,6 +57,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.ChannelGroupFuture;
 import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.handler.ssl.SslContext;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -99,7 +98,7 @@ public class RestExpress
 	private ExceptionMapping exceptionMap = new DefaultExceptionMapper();
 	private List<Plugin> plugins = new ArrayList<Plugin>();
 	private RouteDeclaration routeDeclarations = new RouteDeclaration();
-	private SSLContext sslContext = null;
+	private SslContext sslContext = null;
 	private SerializationProvider serializationProvider = null;
 
 	/**
@@ -213,13 +212,13 @@ public class RestExpress
 		useSystemOut();
 	}
 
-	public RestExpress setSSLContext(SSLContext sslContext)
+	public RestExpress setSSLContext(SslContext sslContext)
 	{
 		this.sslContext = sslContext;
 		return this;
 	}
 
-	public SSLContext getSSLContext()
+	public SslContext getSSLContext()
 	{
 		return sslContext;
 	}

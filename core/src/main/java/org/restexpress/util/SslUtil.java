@@ -1,17 +1,18 @@
 package org.restexpress.util;
 
-import java.util.Arrays;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
+
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslProvider;
 
 public class SslUtil
 {
-	public static SSLContext loadContext(String keyStore,
-			char[] filePassword, char[] keyPassword) throws Exception
+	public static SslContext loadContext(String keyStore, char[] filePassword, char[] keyPassword) throws Exception
 	{
 		FileInputStream fin = null;
 
@@ -24,9 +25,11 @@ public class SslUtil
 			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 			kmf.init(ks, keyPassword);
 
-			SSLContext context = SSLContext.getInstance("TLS");
-			context.init(kmf.getKeyManagers(), null, null);			
-			return context;
+			return SslContextBuilder
+				.forServer(kmf)
+				.protocols("TLS")
+				.sslProvider(SslProvider.JDK)
+				.build();
 		}
 		finally
 		{			
@@ -42,5 +45,4 @@ public class SslUtil
 			}
 		}
 	}
-
 }

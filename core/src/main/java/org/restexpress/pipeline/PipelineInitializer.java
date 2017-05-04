@@ -3,6 +3,10 @@
  */
 package org.restexpress.pipeline;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -12,15 +16,9 @@ import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
-import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.concurrent.EventExecutorGroup;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 
 /**
  * Provides a tiny DSL to define the pipeline features.
@@ -40,7 +38,7 @@ extends ChannelInitializer<SocketChannel>
 	private List<ChannelHandler> requestHandlers = new ArrayList<ChannelHandler>();
 	private int maxContentLength = DEFAULT_MAX_CONTENT_LENGTH;
 	private EventExecutorGroup eventExecutorGroup = null;
-	private SSLContext sslContext = null;
+	private SslContext sslContext = null;
 	private boolean useCompression = true;
 
 	// SECTION: CONSTRUCTORS
@@ -83,13 +81,13 @@ extends ChannelInitializer<SocketChannel>
 		return this;
 	}
 
-	public PipelineInitializer setSSLContext(SSLContext sslContext)
+	public PipelineInitializer setSSLContext(SslContext sslContext)
 	{
 		this.sslContext = sslContext;
 		return this;
 	}
 
-	public SSLContext getSSLContext()
+	public SslContext getSSLContext()
 	{
 		return sslContext;
 	}
@@ -103,10 +101,7 @@ extends ChannelInitializer<SocketChannel>
 
 		if (null != sslContext)
 		{
-			SSLEngine sslEngine = sslContext.createSSLEngine();
-			sslEngine.setUseClientMode(false);
-			SslHandler sslHandler = new SslHandler(sslEngine);
-			pipeline.addLast("ssl", sslHandler);
+			pipeline.addLast("ssl", sslContext.newHandler(ByteBufAllocator.DEFAULT));
 		}
 
 		// Inbound handlers

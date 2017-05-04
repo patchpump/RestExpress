@@ -74,11 +74,15 @@ Please see the Maven Archetypes at https://github.com/RestExpress/RestExpress-Ar
 ===================================================================================================
 Change History/Release Notes:
 ---------------------------------------------------------------------------------------------------
-Release 0.11.4-SNAPSHOT (in master)
+Release 0.12.0-SNAPSHOT (in master)
 -----------------------------------
-* Issue #126 - Introduced RestExpress.noCompression() to turns off response GZip and deflate encoding support (the Netty HttpContentCompressor is not put in the pipeline) for speed optimization (e.g. for small payloads).
+* *BREAKING CHANGE* Issue#140 - Use io.netty.handler.ssl.SslContext instead of java.net.ssl.SSLContext. Using SslUtil still works. Otherwise, use SslContextBuilder.
+* Issue #126 - Introduced RestExpress.noCompression() to turn off response GZip and deflate encoding support (the Netty HttpContentCompressor is not put in the pipeline) for speed optimization (e.g. for small payloads).
+* Issue #130 - Throw on BindException.
+* Issues #137-138 - Use char[] vs String in SslUtil (Merge request from albahrani).
 * Upgraded Jackson Databind to 2.7.4
-* Upgraded Netty to 4.0.36.final
+* Upgraded Netty to 4.1.10.Final
+* Upgraded Xstream to 1.4.9
 
 Release 0.11.3 - 10 Feb 2016
 ----------------------------

@@ -18,7 +18,7 @@ package org.restexpress.exception;
 import java.util.Collections;
 import java.util.List;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.restexpress.Response;
@@ -86,6 +86,6 @@ extends ServiceException
 	@Override
 	public void augmentResponse(Response response)
 	{
-		response.addHeader(HttpHeaders.Names.ALLOW, StringUtils.join(",", getAllowedMethods()));
+		response.addHeader(HttpHeaderNames.ALLOW.toString(), StringUtils.join(",", getAllowedMethods()));
 	}
 }

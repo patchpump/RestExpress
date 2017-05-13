@@ -17,7 +17,7 @@ package org.restexpress.serialization;
 
 import java.nio.ByteBuffer;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.response.ResponseProcessor;
@@ -58,7 +58,7 @@ public class SerializationSettings
 	
     public ByteBuffer serialize(Response response)
     {
-		if (!response.hasHeader(HttpHeaders.Names.CONTENT_TYPE))
+		if (!response.hasHeader(HttpHeaderNames.CONTENT_TYPE.toString()))
 		{
 			response.setContentType(mediaType);
 		}

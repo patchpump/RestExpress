@@ -36,7 +36,7 @@ import org.junit.AfterClass;
 import org.junit.Test;
 import org.restexpress.exception.NoRoutesDefinedException;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 
 
@@ -354,7 +354,7 @@ public class RestExpressTest
 		HttpPost post = new HttpPost(testUrl);
 		try
 		{
-			post.addHeader(HttpHeaders.Names.ACCEPT, "application/json");
+			post.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/json");
 			HttpResponse response = (HttpResponse) CLIENT.execute(post);
 			assertEquals(201, response.getStatusLine().getStatusCode());
 			assertEquals(ContentType.JSON, controller.outputMediaType);
@@ -367,7 +367,7 @@ public class RestExpressTest
 		HttpGet get = new HttpGet(testUrl);
 		try
 		{
-			get.addHeader(HttpHeaders.Names.ACCEPT, "application/json");
+			get.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/json");
 			HttpResponse response = (HttpResponse) CLIENT.execute(get);
 			assertEquals(200, response.getStatusLine().getStatusCode());
 			assertEquals(ContentType.JSON, controller.outputMediaType);
@@ -380,7 +380,7 @@ public class RestExpressTest
 		HttpPut put = new HttpPut(testUrl);
 		try
 		{
-			put.addHeader(HttpHeaders.Names.ACCEPT, "application/json");
+			put.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/json");
 			HttpResponse response = (HttpResponse) CLIENT.execute(put);
 			assertEquals(200, response.getStatusLine().getStatusCode());
 			assertEquals(ContentType.JSON, controller.outputMediaType);
@@ -393,7 +393,7 @@ public class RestExpressTest
 		HttpDelete delete = new HttpDelete(testUrl);
 		try
 		{
-			delete.addHeader(HttpHeaders.Names.ACCEPT, "application/json");
+			delete.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/json");
 			HttpResponse response = (HttpResponse) CLIENT.execute(delete);
 			assertEquals(200, response.getStatusLine().getStatusCode());
 			assertEquals(ContentType.JSON, controller.outputMediaType);

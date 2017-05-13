@@ -15,9 +15,9 @@
  */
 package org.restexpress.util;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.ALLOW;
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderNames.ALLOW;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.restexpress.Response;
@@ -162,7 +162,7 @@ public final class HttpSpecification
 	 */
 	private static void ensureNoContentLength(Response response)
 	{
-		if (response.getHeader(CONTENT_LENGTH) != null)
+		if (response.getHeader(CONTENT_LENGTH.toString()) != null)
 		{
 			throw new HttpSpecificationException("HTTP 1.1 specification: must not contain Content-Length header for status: " + response.getResponseStatus());
 		}
@@ -173,7 +173,7 @@ public final class HttpSpecification
 	 */
 	private static void ensureNoContentType(Response response)
 	{
-		if (response.getHeader(CONTENT_TYPE) != null)
+		if (response.getHeader(CONTENT_TYPE.toString()) != null)
 		{
 			throw new HttpSpecificationException("HTTP 1.1 specification: must not contain Content-Type header for status: " + response.getResponseStatus());
 		}
@@ -181,7 +181,7 @@ public final class HttpSpecification
 
 	private static void ensureAllowHeader(Response response)
 	{
-		if (response.getHeader(ALLOW) == null)
+		if (response.getHeader(ALLOW.toString()) == null)
 		{
 			throw new HttpSpecificationException("HTTP 1.1 specification: must contain Allow header for status: " + response.getResponseStatus());
 		}

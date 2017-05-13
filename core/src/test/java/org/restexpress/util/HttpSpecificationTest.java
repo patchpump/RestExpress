@@ -18,14 +18,13 @@ package org.restexpress.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.restexpress.ContentType;
 import org.restexpress.Response;
 import org.restexpress.exception.HttpSpecificationException;
-import org.restexpress.util.HttpSpecification;
 
 /**
  * @author toddf
@@ -47,7 +46,7 @@ public class HttpSpecificationTest
 		response.setResponseStatus(HttpResponseStatus.OK);
 		response.setBody("Should be allowed.");
 		response.setContentType(ContentType.JSON);
-		response.addHeader(HttpHeaders.Names.CONTENT_LENGTH, "15");
+		response.addHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), "15");
 		HttpSpecification.enforce(response);
 	}
 
@@ -57,7 +56,7 @@ public class HttpSpecificationTest
 		response.setResponseStatus(HttpResponseStatus.CREATED);
 		response.setBody("Should be allowed.");
 		response.setContentType(ContentType.JSON);
-		response.addHeader(HttpHeaders.Names.CONTENT_LENGTH, "15");
+		response.addHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), "15");
 		HttpSpecification.enforce(response);
 	}
 
@@ -67,7 +66,7 @@ public class HttpSpecificationTest
 		response.setResponseStatus(HttpResponseStatus.CONFLICT);
 		response.setBody("Should be allowed.");
 		response.setContentType(ContentType.JSON);
-		response.addHeader(HttpHeaders.Names.CONTENT_LENGTH, "15");
+		response.addHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), "15");
 		HttpSpecification.enforce(response);
 	}
 
@@ -77,7 +76,7 @@ public class HttpSpecificationTest
 		response.setResponseStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		response.setBody("Should be allowed.");
 		response.setContentType(ContentType.JSON);
-		response.addHeader(HttpHeaders.Names.CONTENT_LENGTH, "15");
+		response.addHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), "15");
 		HttpSpecification.enforce(response);
 	}
 
@@ -101,7 +100,7 @@ public class HttpSpecificationTest
 	public void shouldThrowExceptionOn100WithContentType()
 	{
 		response.setResponseStatus(HttpResponseStatus.CONTINUE);
-		response.addHeader(HttpHeaders.Names.CONTENT_TYPE, ContentType.XML);
+		response.addHeader(HttpHeaderNames.CONTENT_TYPE.toString(), ContentType.XML);
 		HttpSpecification.enforce(response);
 	}
 
@@ -109,7 +108,7 @@ public class HttpSpecificationTest
 	public void shouldThrowExceptionOn100WithContentLength()
 	{
 		response.setResponseStatus(HttpResponseStatus.CONTINUE);
-		response.addHeader(HttpHeaders.Names.CONTENT_LENGTH, "25");
+		response.addHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), "25");
 		HttpSpecification.enforce(response);
 	}
 
@@ -133,7 +132,7 @@ public class HttpSpecificationTest
 	public void shouldThrowExceptionOn204WithContentType()
 	{
 		response.setResponseStatus(HttpResponseStatus.NO_CONTENT);
-		response.addHeader(HttpHeaders.Names.CONTENT_TYPE, ContentType.XML);
+		response.addHeader(HttpHeaderNames.CONTENT_TYPE.toString(), ContentType.XML);
 		HttpSpecification.enforce(response);
 	}
 
@@ -141,7 +140,7 @@ public class HttpSpecificationTest
 	public void shouldThrowExceptionOn204WithContentLength()
 	{
 		response.setResponseStatus(HttpResponseStatus.NO_CONTENT);
-		response.addHeader(HttpHeaders.Names.CONTENT_LENGTH, "25");
+		response.addHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), "25");
 		HttpSpecification.enforce(response);
 	}
 
@@ -165,7 +164,7 @@ public class HttpSpecificationTest
 	public void shouldThrowExceptionOn304WithContentType()
 	{
 		response.setResponseStatus(HttpResponseStatus.NOT_MODIFIED);
-		response.addHeader(HttpHeaders.Names.CONTENT_TYPE, ContentType.XML);
+		response.addHeader(HttpHeaderNames.CONTENT_TYPE.toString(), ContentType.XML);
 		HttpSpecification.enforce(response);
 	}
 
@@ -173,7 +172,7 @@ public class HttpSpecificationTest
 	public void shouldThrowExceptionOn304WithContentLength()
 	{
 		response.setResponseStatus(HttpResponseStatus.NOT_MODIFIED);
-		response.addHeader(HttpHeaders.Names.CONTENT_LENGTH, "25");
+		response.addHeader(HttpHeaderNames.CONTENT_LENGTH.toString(), "25");
 		HttpSpecification.enforce(response);
 	}
 

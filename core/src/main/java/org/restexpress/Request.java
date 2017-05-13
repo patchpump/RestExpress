@@ -19,12 +19,7 @@ package org.restexpress;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.*;
 
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -94,8 +89,8 @@ public class Request
 	{
 		super();
 		this.httpRequest = request;
-		this.httpVersion = request.getProtocolVersion();
-		this.effectiveHttpMethod = request.getMethod();
+		this.httpVersion = request.protocolVersion();
+		this.effectiveHttpMethod = request.method();
 		this.routeResolver = routeResolver;
 		this.serializationProvider = serializationProvider;
 	    createCorrelationId();
@@ -130,7 +125,7 @@ public class Request
 	 */
 	public HttpMethod getHttpMethod()
 	{
-		return httpRequest.getMethod();
+		return httpRequest.method();
 	}
 	
 	/**
@@ -436,7 +431,7 @@ public class Request
 	 */
 	public String getPath()
 	{
-		return httpRequest.getUri();
+		return httpRequest.uri();
 	}
 	
 	/**
@@ -516,19 +511,15 @@ public class Request
 
 	public boolean isKeepAlive()
 	{
-		return HttpHeaders.isKeepAlive(httpRequest);
+		return HttpUtil.isKeepAlive(httpRequest);
 	}
 
 	public boolean isChunked()
 	{
-        //This is the logic the Netty 3.9.x used to determine if data was chunked.  There may be a methodology more
-        // inline with Netty 4.x.x to determine if the request is chunked.  TODO: Implement updated logic.
-        for (String header : httpRequest.headers().getAll(HttpHeaders.Names.TRANSFER_ENCODING)) {
-            if (HttpHeaders.Values.CHUNKED.equalsIgnoreCase(header)) {
-                return true;
-            }
-        }
-        return false;
+		if (HttpUtil.isTransferEncodingChunked(httpRequest))
+			return true;
+		else
+        	return false;
 	}
 	
 	/**
@@ -548,7 +539,7 @@ public class Request
 	 */
 	public String getHost()
 	{
-		return HttpHeaders.getHost(httpRequest);
+		return httpRequest.headers().get(HttpHeaderNames.HOST);
 	}
 
 	/**
@@ -558,7 +549,7 @@ public class Request
 	 */
 	public String getProtocol()
 	{
-		return httpRequest.getProtocolVersion().protocolName().toLowerCase();
+		return httpRequest.protocolVersion().protocolName().toLowerCase();
 	}
 	
 	/**
@@ -697,9 +688,9 @@ public class Request
 	 */
 	private void parseQueryString(final HttpRequest request)
 	{
-		if (!request.getUri().contains("?")) return;
+		if (!request.uri().contains("?")) return;
 
-		Map<String, List<String>> parameters = new QueryStringParser(request.getUri(), true).getParameters();
+		Map<String, List<String>> parameters = new QueryStringParser(request.uri(), true).getParameters();
 
 		if (parameters == null || parameters.isEmpty()) return;
 
@@ -730,7 +721,7 @@ public class Request
 	 */
 	private void determineEffectiveHttpMethod(HttpRequest request)
 	{
-		if (!HttpMethod.POST.equals(request.getMethod())) return;
+		if (!HttpMethod.POST.equals(request.method())) return;
 
 		String methodString = request.headers().get(Parameters.Query.METHOD_TUNNEL);
 

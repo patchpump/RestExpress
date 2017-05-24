@@ -77,6 +77,7 @@ Change History/Release Notes:
 Release 0.12.0-SNAPSHOT (in master)
 -----------------------------------
 * *BREAKING CHANGE* Issue#140 - Use io.netty.handler.ssl.SslContext instead of java.net.ssl.SSLContext. Using SslUtil still works. Otherwise, use SslContextBuilder.
+* *BREAKING CHANGE* Issue#135 - Query-string parameter keys and values are URL decoded before putting them into the header and query-string maps.
 * Issue #126 - Introduced RestExpress.noCompression() to turn off response GZip and deflate encoding support (the Netty HttpContentCompressor is not put in the pipeline) for speed optimization (e.g. for small payloads).
 * Issue #130 - Throw on BindException.
 * Issues #137-138 - Use char[] vs String in SslUtil (Merge request from albahrani).

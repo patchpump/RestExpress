@@ -17,15 +17,6 @@
 
 package org.restexpress;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.QueryStringDecoder;
-
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
@@ -44,6 +35,15 @@ import org.restexpress.route.RouteResolver;
 import org.restexpress.serialization.SerializationProvider;
 import org.restexpress.serialization.SerializationSettings;
 import org.restexpress.url.QueryStringParser;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 /**
  * @author toddf
@@ -707,19 +707,25 @@ public class Request
 		
 		for (Entry<String, List<String>> entry : parameters.entrySet())
 		{
-			queryStringMap.put(entry.getKey(), entry.getValue().get(0));
+			String key = decode(entry.getKey());
+			queryStringMap.put(key, decode(entry.getValue().get(0)));
 
 			for (String value : entry.getValue())
 			{
-				try
-                {
-	                request.headers().add(entry.getKey(), URLDecoder.decode(value, ContentType.ENCODING));
-                }
-                catch (Exception e)
-                {
-	                request.headers().add(entry.getKey(), value);
-                }
+                request.headers().add(key, decode(value));
 			}
+		}
+	}
+
+	private String decode(String encoded)
+	{
+		try
+		{
+			return URLDecoder.decode(encoded, ContentType.ENCODING);
+		}
+		catch (Exception e)
+		{
+			return encoded;
 		}
 	}
 

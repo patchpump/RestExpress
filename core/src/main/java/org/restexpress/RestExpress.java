@@ -50,6 +50,7 @@ import org.restexpress.util.DefaultShutdownHook;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.AdaptiveRecvByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -746,10 +747,12 @@ public class RestExpress
 		bootstrap.option(ChannelOption.SO_LINGER, getSoLinger());
 		bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, getConnectTimeoutMillis());
 		bootstrap.option(ChannelOption.SO_RCVBUF, getReceiveBufferSize());
-		bootstrap.option(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
+//		bootstrap.option(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
+		bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator());
 
 		bootstrap.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true));
-	    bootstrap.childOption(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
+//	    bootstrap.childOption(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
+		bootstrap.childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator());
 		bootstrap.childOption(ChannelOption.SO_RCVBUF, getReceiveBufferSize());
 		bootstrap.childOption(ChannelOption.SO_REUSEADDR, shouldReuseAddress());
 	}

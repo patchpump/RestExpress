@@ -704,19 +704,25 @@ public class Request
 		
 		for (Entry<String, List<String>> entry : parameters.entrySet())
 		{
-			queryStringMap.put(entry.getKey(), entry.getValue().get(0));
+			String key = decode(entry.getKey());
+			queryStringMap.put(key, decode(entry.getValue().get(0)));
 
 			for (String value : entry.getValue())
 			{
-				try
-                {
-	                request.headers().add(entry.getKey(), URLDecoder.decode(value, ContentType.ENCODING));
-                }
-                catch (Exception e)
-                {
-	                request.headers().add(entry.getKey(), value);
-                }
+                request.headers().add(key, decode(value));
 			}
+		}
+	}
+
+	private String decode(String encoded)
+	{
+		try
+		{
+			return URLDecoder.decode(encoded, ContentType.ENCODING);
+		}
+		catch (Exception e)
+		{
+			return encoded;
 		}
 	}
 

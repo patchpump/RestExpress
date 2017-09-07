@@ -738,18 +738,19 @@ public class RestExpress
 
 	private void setBootstrapOptions(ServerBootstrap bootstrap)
 	{
-		bootstrap.option(ChannelOption.SO_KEEPALIVE, useKeepAlive());
 		bootstrap.option(ChannelOption.SO_BACKLOG, 1024);
-	    bootstrap.option(ChannelOption.TCP_NODELAY, useTcpNoDelay());
-		bootstrap.option(ChannelOption.SO_KEEPALIVE, serverSettings.isKeepAlive());
 		bootstrap.option(ChannelOption.SO_REUSEADDR, shouldReuseAddress());
-		bootstrap.option(ChannelOption.SO_LINGER, getSoLinger());
 		bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, getConnectTimeoutMillis());
 		bootstrap.option(ChannelOption.SO_RCVBUF, getReceiveBufferSize());
-		bootstrap.option(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
+		bootstrap.option(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE); // need to replace on MaxMessagesRecvByteBufAllocator
+		//bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(Integer.MAX_VALUE));
 
+		bootstrap.childOption(ChannelOption.SO_KEEPALIVE, useKeepAlive());
+		bootstrap.childOption(ChannelOption.TCP_NODELAY, useTcpNoDelay());
+		bootstrap.childOption(ChannelOption.SO_LINGER, getSoLinger());
 		bootstrap.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true));
-	    bootstrap.childOption(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
+	    bootstrap.childOption(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE); // need to replace on MaxMessagesRecvByteBufAllocator
+		//bootstrap.childOption(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(Integer.MAX_VALUE));
 		bootstrap.childOption(ChannelOption.SO_RCVBUF, getReceiveBufferSize());
 		bootstrap.childOption(ChannelOption.SO_REUSEADDR, shouldReuseAddress());
 	}

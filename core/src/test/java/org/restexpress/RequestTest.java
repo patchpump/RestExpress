@@ -112,9 +112,22 @@ public class RequestTest
 	}
 
 	@Test
-	public void shouldHandleUrlEncodedQueryString()
+	public void shouldDecodeQueryStringMapKey()
+	{
+		Request r = new Request(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/foo?bar%26bat=true"), null);
+		Map<String, String> m = r.getQueryStringMap();
+		assertNotNull(m);
+		assertEquals("true", m.get("bar&bat"));
+		assertEquals("true", r.getHeader("bar&bat"));
+	}
+
+	@Test
+	public void shouldDecodeUrlEncodedQueryStringMapValue()
 	{
 		Request r = new Request(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/foo?assertion=assertion%7CfitnesseIdm40%40ecollege.com%7C2013-03-14T18%3A02%3A08%2B00%3A00%7C2f6f1b0fa8ecce7d092c1c45cc44e4c7"), null);
+		Map<String, String> m = r.getQueryStringMap();
+		assertNotNull(m);
+		assertEquals("assertion|fitnesseIdm40@ecollege.com|2013-03-14T18:02:08+00:00|2f6f1b0fa8ecce7d092c1c45cc44e4c7", m.get("assertion"));
 		assertEquals("assertion|fitnesseIdm40@ecollege.com|2013-03-14T18:02:08+00:00|2f6f1b0fa8ecce7d092c1c45cc44e4c7", r.getHeader("assertion"));
 	}
 

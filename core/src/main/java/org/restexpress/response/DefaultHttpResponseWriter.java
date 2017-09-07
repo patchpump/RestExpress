@@ -29,8 +29,7 @@ public class DefaultHttpResponseWriter
 implements HttpResponseWriter
 {
 	@Override
-	public void write(ChannelHandlerContext ctx, Request request,
-	    Response response)
+	public void write(ChannelHandlerContext ctx, Request request, Response response)
 	{
 		// The DefaultHttpResponseWriter will include the provided response body (if provided),
 		// else the default empty body (from the DefaultFullHttpResponse class) will be included.

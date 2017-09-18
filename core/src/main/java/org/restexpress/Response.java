@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.restexpress.common.query.QueryRange;
 import org.restexpress.serialization.SerializationSettings;
@@ -35,9 +35,6 @@ import org.restexpress.serialization.SerializationSettings;
  */
 public class Response
 {
-	private static final String CONTENT_RANGE_HEADER_NAME = "Content-Range";
-
-	
 	// SECTION: INSTANCE VARIABLES
 
 	private HttpResponseStatus responseCode = OK;
@@ -137,12 +134,12 @@ public class Response
 	 */
 	public void addRangeHeader(QueryRange range, long count)
 	{
-    	addHeader(CONTENT_RANGE_HEADER_NAME, range.asContentRange(count));
+    	addHeader(HttpHeaderNames.CONTENT_RANGE.toString(), range.asContentRange(count));
 	}
 	
 	public void addLocationHeader(String url)
 	{
-		addHeader(HttpHeaders.Names.LOCATION, url);
+		addHeader(HttpHeaderNames.LOCATION.toString(), url);
 	}
 
 	/**
@@ -249,12 +246,12 @@ public class Response
 
 	public String getContentType()
     {
-		return getHeader(HttpHeaders.Names.CONTENT_TYPE);
+		return getHeader(HttpHeaderNames.CONTENT_TYPE.toString());
     }
 
 	public void setContentType(String contentType)
     {
-		List<String> list = headers.get(HttpHeaders.Names.CONTENT_TYPE);
+		List<String> list = headers.get(HttpHeaderNames.CONTENT_TYPE);
 
 		if (list != null && !list.isEmpty())
 		{
@@ -263,7 +260,7 @@ public class Response
 		}
 		else if (list == null)
 		{
-			addHeader(HttpHeaders.Names.CONTENT_TYPE, contentType);
+			addHeader(HttpHeaderNames.CONTENT_TYPE.toString(), contentType);
 		}
     }
 

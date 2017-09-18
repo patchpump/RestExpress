@@ -43,7 +43,7 @@ import org.restexpress.serialization.NullSerializationProvider;
 import org.restexpress.serialization.json.JacksonJsonProcessor;
 import org.restexpress.serialization.xml.XstreamXmlProcessor;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -191,8 +191,8 @@ public class AltRestExpressServerTest
 		{
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
-			assertEquals(String.valueOf("\"read\"".length()), response.getFirstHeader(HttpHeaders.Names.CONTENT_LENGTH).getValue());
-			assertEquals(ContentType.JSON, response.getFirstHeader(HttpHeaders.Names.CONTENT_TYPE).getValue());
+			assertEquals(String.valueOf("\"read\"".length()), response.getFirstHeader(HttpHeaderNames.CONTENT_LENGTH.toString().toString()).getValue());
+			assertEquals(ContentType.JSON, response.getFirstHeader(HttpHeaderNames.CONTENT_TYPE.toString()).getValue());
 			assertNull(response.getEntity());
 		}
 		finally
@@ -298,7 +298,7 @@ public class AltRestExpressServerTest
 			assertTrue(json.contains("\"httpStatus\":405"));
 			assertTrue(json.contains("\"message\":\"" + URL3_PLAIN + "\""));
 			assertTrue(json.contains("\"errorType\":\"MethodNotAllowedException\""));
-			String methods = response.getHeaders(HttpHeaders.Names.ALLOW)[0].getValue();
+			String methods = response.getHeaders(HttpHeaderNames.ALLOW.toString())[0].getValue();
 			assertTrue(methods.contains("GET"));
 			assertTrue(methods.contains("POST"));
 		}
@@ -327,7 +327,7 @@ public class AltRestExpressServerTest
 			assertTrue(json.contains("\"httpStatus\":405"));
 			assertTrue(json.contains("\"message\":\"" + URL3_PLAIN + "?_ignore_http_status=true\""));
 			assertTrue(json.contains("\"errorType\":\"MethodNotAllowedException\""));
-			String methods = response.getHeaders(HttpHeaders.Names.ALLOW)[0].getValue();
+			String methods = response.getHeaders(HttpHeaderNames.ALLOW.toString())[0].getValue();
 			assertTrue(methods.contains("GET"));
 			assertTrue(methods.contains("POST"));
 		}
@@ -388,7 +388,7 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT, "application/xml");
+			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/xml");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
 			HttpEntity entity = response.getEntity();
@@ -409,7 +409,7 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT, "application/json");
+			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/json");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
 			HttpEntity entity = response.getEntity();
@@ -523,7 +523,7 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT, "application/nogood");
+			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/nogood");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.NOT_ACCEPTABLE.code(), response.getStatusLine().getStatusCode());
 			HttpEntity entity = response.getEntity();
@@ -576,7 +576,7 @@ public class AltRestExpressServerTest
 			HttpEntity entity = response.getEntity();
 			assertTrue(entity.getContentLength() > 0l);
 			assertEquals(ContentType.JSON, entity.getContentType().getValue());
-			Header range = response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE);
+			Header range = response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString());
 			assertNotNull(range);
 			assertEquals("items 0-2/3", range.getValue());
 			LittleO[] result = DEFAULT_SERIALIZER.getSerializer(Format.JSON).deserialize(
@@ -597,14 +597,14 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT, "no-good/no-good");
+			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "no-good/no-good");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.NOT_ACCEPTABLE.code(), response
 			    .getStatusLine().getStatusCode());
 			HttpEntity entity = response.getEntity();
 			assertTrue(entity.getContentLength() > 0l);
 			assertEquals(ContentType.JSON, entity.getContentType().getValue());
-			assertNull(response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE));
+			assertNull(response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString()));
 			String json = EntityUtils.toString(entity);
 			assertNotNull(json);
 			assertTrue(json.startsWith("{\"errorId\":"));
@@ -652,7 +652,7 @@ public class AltRestExpressServerTest
 			HttpEntity entity = response.getEntity();
 			assertTrue(entity.getContentLength() > 0l);
 			assertEquals(ContentType.XML, entity.getContentType().getValue());
-			Header range = response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE);
+			Header range = response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString());
 			assertNotNull(range);
 			assertEquals("items 0-2/3", range.getValue());
 			String entityString = EntityUtils.toString(entity);
@@ -674,13 +674,13 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT, "application/hal+json");
+			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/hal+json");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
 			HttpEntity entity = response.getEntity();
 			assertTrue(entity.getContentLength() > 0l);
 			assertEquals(ContentType.HAL_JSON, entity.getContentType().getValue());
-			Header range = response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE);
+			Header range = response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString());
 			assertNotNull(range);
 			assertEquals("items 0-2/3", range.getValue());
 			String entityString = EntityUtils.toString(entity);
@@ -700,13 +700,13 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT, "application/hal+xml");
+			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/hal+xml");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
 			HttpEntity entity = response.getEntity();
 			assertTrue(entity.getContentLength() > 0l);
 			assertEquals(ContentType.HAL_XML, entity.getContentType().getValue());
-			Header range = response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE);
+			Header range = response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString());
 			assertNotNull(range);
 			assertEquals("items 0-2/3", range.getValue());
 			String entityString = EntityUtils.toString(entity);
@@ -732,7 +732,7 @@ public class AltRestExpressServerTest
 			HttpEntity entity = response.getEntity();
 			assertTrue(entity.getContentLength() > 0l);
 			assertEquals(ContentType.JSON, entity.getContentType().getValue());
-			assertNull(response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE));
+			assertNull(response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString()));
 			String entityString = EntityUtils.toString(entity);
 			assertNotNull(entityString);
 			assertTrue(entityString.contains("\"errorId\":\""));
@@ -767,7 +767,7 @@ public class AltRestExpressServerTest
 //			HttpEntity entity = response.getEntity();
 //			assertTrue(entity.getContentLength() > 0l);
 //			assertEquals(ContentType.JSON, entity.getContentType().getValue());
-//			assertNull(response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE));
+//			assertNull(response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString()));
 //			String entityString = EntityUtils.toString(entity);
 //			assertNotNull(entityString);
 //			assertTrue(entityString.contains("\"errorId\":\""));
@@ -794,7 +794,7 @@ public class AltRestExpressServerTest
 			HttpEntity entity = response.getEntity();
 			assertTrue(entity.getContentLength() > 0l);
 			assertEquals(ContentType.JSON, entity.getContentType().getValue());
-			assertNull(response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE));
+			assertNull(response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString()));
 			String entityString = EntityUtils.toString(entity);
 			assertNotNull(entityString);
 			assertTrue(entityString.contains("\"errorId\":\""));
@@ -822,7 +822,7 @@ public class AltRestExpressServerTest
 //			HttpEntity entity = response.getEntity();
 //			assertTrue(entity.getContentLength() > 0l);
 //			assertEquals(ContentType.JSON, entity.getContentType().getValue());
-//			assertNull(response.getFirstHeader(HttpHeaders.Names.CONTENT_RANGE));
+//			assertNull(response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString()));
 //			String entityString = EntityUtils.toString(entity);
 //			assertNotNull(entityString);
 //			assertTrue(entityString.contains("\"errorId\":\""));
@@ -885,7 +885,7 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT_ENCODING, "gzip");
+			request.addHeader(HttpHeaderNames.ACCEPT_ENCODING.toString(), "gzip");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
 	
@@ -917,7 +917,7 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT_ENCODING, "deflate");
+			request.addHeader(HttpHeaderNames.ACCEPT_ENCODING.toString(), "deflate");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
 	
@@ -950,7 +950,7 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.CONTENT_ENCODING, "gzip");
+			request.addHeader(HttpHeaderNames.CONTENT_ENCODING.toString(), "gzip");
 	
 			BasicHttpEntity requestEntity = new BasicHttpEntity();
 	
@@ -982,7 +982,7 @@ public class AltRestExpressServerTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.CONTENT_ENCODING, "deflate");
+			request.addHeader(HttpHeaderNames.CONTENT_ENCODING.toString(), "deflate");
 			BasicHttpEntity requestEntity = new BasicHttpEntity();
 			ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
 			DeflaterOutputStream inflaterOutput = new DeflaterOutputStream(byteArrayOut);

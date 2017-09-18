@@ -17,7 +17,7 @@ package org.restexpress.preprocessor;
 
 import javax.xml.bind.DatatypeConverter;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 import org.restexpress.ContentType;
 import org.restexpress.Flags;
@@ -111,7 +111,7 @@ implements Preprocessor
 			return;
 		}
 
-		String authorization = request.getHeader(HttpHeaders.Names.AUTHORIZATION);
+		String authorization = request.getHeader(HttpHeaderNames.AUTHORIZATION.toString());
 
 		if (authorization == null || !authorization.startsWith("Basic "))
 		{
@@ -137,7 +137,7 @@ implements Preprocessor
 	private void throwUnauthorizedException()
     {
 	    UnauthorizedException e = new UnauthorizedException("Authentication required");
-	    e.setHeader(HttpHeaders.Names.WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"");
+	    e.setHeader(HttpHeaderNames.WWW_AUTHENTICATE.toString(), "Basic realm=\"" + realm + "\"");
 	    throw e;
     }
 }

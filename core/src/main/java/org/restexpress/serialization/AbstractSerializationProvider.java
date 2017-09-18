@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.common.exception.ConfigurationException;
@@ -160,7 +160,7 @@ implements SerializationProvider
 
 		if (processor == null)
 		{
-			List<MediaRange> requestedMediaRanges = MediaTypeParser.parse(request.getHeader(HttpHeaders.Names.CONTENT_TYPE));
+			List<MediaRange> requestedMediaRanges = MediaTypeParser.parse(request.getHeader(HttpHeaderNames.CONTENT_TYPE.toString()));
 			bestMatch = MediaTypeParser.getBestMatch(supportedMediaRanges, requestedMediaRanges);
 	
 			if (bestMatch != null)
@@ -174,7 +174,7 @@ implements SerializationProvider
 			processor = defaultProcessor;
 		}
 
-		return new SerializationSettings((bestMatch == null ? request.getHeader(HttpHeaders.Names.CONTENT_TYPE) : bestMatch), processor);
+		return new SerializationSettings((bestMatch == null ? request.getHeader(HttpHeaderNames.CONTENT_TYPE.toString()) : bestMatch), processor);
 	}
 
 	@Override
@@ -206,7 +206,7 @@ implements SerializationProvider
 
 		if (processor == null)
 		{
-			List<MediaRange> requestedMediaRanges = MediaTypeParser.parse(request.getHeader(HttpHeaders.Names.ACCEPT));
+			List<MediaRange> requestedMediaRanges = MediaTypeParser.parse(request.getHeader(HttpHeaderNames.ACCEPT.toString()));
 			bestMatch = MediaTypeParser.getBestMatch(supportedMediaRanges, requestedMediaRanges);
 	
 			if (bestMatch != null)

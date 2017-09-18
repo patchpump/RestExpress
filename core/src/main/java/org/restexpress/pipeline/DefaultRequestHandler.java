@@ -16,6 +16,15 @@
  */
 package org.restexpress.pipeline;
 
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.AttributeKey;
+
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -34,15 +43,6 @@ import org.restexpress.route.RouteResolver;
 import org.restexpress.serialization.SerializationProvider;
 import org.restexpress.serialization.SerializationSettings;
 import org.restexpress.util.HttpSpecification;
-
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.AttributeKey;
 
 /**
  * @author toddf
@@ -414,7 +414,7 @@ extends SimpleChannelInboundHandler<FullHttpRequest>
 					{
                         response.setBody(Unpooled.wrappedBuffer(serialized));
 
-						if (!response.hasHeader(HttpHeaders.Names.CONTENT_TYPE))
+						if (!response.hasHeader(HttpHeaderNames.CONTENT_TYPE.toString()))
 						{
 							response.setContentType(settings.getMediaType());
 						}
@@ -422,7 +422,7 @@ extends SimpleChannelInboundHandler<FullHttpRequest>
 				}
 			}
 
-			if (!response.hasHeader(HttpHeaders.Names.CONTENT_TYPE))
+			if (!response.hasHeader(HttpHeaderNames.CONTENT_TYPE.toString()))
 			{
 				response.setContentType(ContentType.TEXT_PLAIN);
 			}

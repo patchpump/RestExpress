@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.restexpress.pipeline.SimpleConsoleLogMessageObserver;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -86,7 +86,7 @@ public class ServerCompressionTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT_ENCODING, "gzip");
+			request.addHeader(HttpHeaderNames.ACCEPT_ENCODING.toString(), "gzip");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
 	
@@ -118,7 +118,7 @@ public class ServerCompressionTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.ACCEPT_ENCODING, "deflate");
+			request.addHeader(HttpHeaderNames.ACCEPT_ENCODING.toString(), "deflate");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
 			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
 	
@@ -151,7 +151,7 @@ public class ServerCompressionTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.CONTENT_ENCODING, "gzip");
+			request.addHeader(HttpHeaderNames.CONTENT_ENCODING.toString(), "gzip");
 	
 			BasicHttpEntity requestEntity = new BasicHttpEntity();
 	
@@ -183,7 +183,7 @@ public class ServerCompressionTest
 
 		try
 		{
-			request.addHeader(HttpHeaders.Names.CONTENT_ENCODING, "deflate");
+			request.addHeader(HttpHeaderNames.CONTENT_ENCODING.toString(), "deflate");
 			BasicHttpEntity requestEntity = new BasicHttpEntity();
 			ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
 			DeflaterOutputStream inflaterOutput = new DeflaterOutputStream(byteArrayOut);

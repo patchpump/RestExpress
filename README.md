@@ -28,7 +28,7 @@ Development:
 		<dependency>
 			<groupId>com.strategicgains</groupId>
 			<artifactId>RestExpress</artifactId>
-			<version>0.11.4-SNAPSHOT</version>
+			<version>0.12.0-SNAPSHOT</version>
 		</dependency>
 ```
 Or download the jar directly from: http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22RestExpress%22
@@ -82,9 +82,11 @@ Release 0.12.0-SNAPSHOT (in master)
 * Issue #130 - Throw on BindException.
 * Issues #137-138 - Use char[] vs String in SslUtil (Merge request from albahrani).
 * Issue #131 - RestExpress.setReadTimeoutSeconds(int seconds) or setReadTimeout(long, TimeUnit) now causes RestExpress to inject a ReadTimeoutHandler into the pipeline.
-* Upgraded Jackson Databind to 2.7.4
-* Upgraded Netty to 4.1.10.Final
-* Upgraded Xstream to 1.4.9
+* Upgraded Jackson Databind to 2.8.11.3
+* Upgraded Netty to 4.1.33.Final
+* Upgraded Xstream to 1.4.11.1
+* Upgraded OWASP encoder to 1.2.2
+* Updated to compile with JDK 11 (use Base64 instead of DatatypeConverter in HttpBasicAuthenticationPreprocessor).
 
 Release 0.11.3 - 10 Feb 2016
 ----------------------------

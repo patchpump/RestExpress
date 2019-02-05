@@ -1,5 +1,3 @@
-[![Build Status](https://buildhive.cloudbees.com/job/RestExpress/job/RestExpress/badge/icon)](https://buildhive.cloudbees.com/job/RestExpress/job/RestExpress/)
-
 [![Stories in Ready](https://badge.waffle.io/RestExpress/RestExpress.png?label=Ready)](http://waffle.io/RestExpress/RestExpress)
 
 RestExpress is a thin wrapper on the JBOSS Netty HTTP stack to provide a simple and easy way to
@@ -28,7 +26,7 @@ Development:
 		<dependency>
 			<groupId>com.strategicgains</groupId>
 			<artifactId>RestExpress</artifactId>
-			<version>0.11.4-SNAPSHOT</version>
+			<version>0.12.0-SNAPSHOT</version>
 		</dependency>
 ```
 Or download the jar directly from: http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22RestExpress%22
@@ -52,9 +50,8 @@ Note that to use the SNAPSHOT version, you must enable snapshots and a repositor
   </profiles>
 ```
 
-===================================================================================================
 ## A quick tutorial:
-
+====================
 Please see the Maven Archetypes at https://github.com/RestExpress/RestExpress-Archetype for kick-starting your API.
 
 * HTTP Methods, if not changed in the fluent (DSL) interface, map to the following:
@@ -71,9 +68,9 @@ Please see the Maven Archetypes at https://github.com/RestExpress/RestExpress-Ar
 
 * For more real-world examples, see the https://github.com/RestExpress/RestExpress-Examples repo which contains additional projects that setup RestExpress services.  Simply do '**mvn exec:java**' to run them.  Then to see what's available perform a GET on the route: '/routes/metadata' to get a list of all the routes (or endpoints) available (e.g. localhost:8081/routes/metadata in the browser).
 
-===================================================================================================
 Change History/Release Notes:
----------------------------------------------------------------------------------------------------
+=============================
+
 Release 0.12.0-SNAPSHOT (in master)
 -----------------------------------
 * *BREAKING CHANGE* Issue#140 - Use io.netty.handler.ssl.SslContext instead of java.net.ssl.SSLContext. Using SslUtil still works. Otherwise, use SslContextBuilder.
@@ -82,9 +79,11 @@ Release 0.12.0-SNAPSHOT (in master)
 * Issue #130 - Throw on BindException.
 * Issues #137-138 - Use char[] vs String in SslUtil (Merge request from albahrani).
 * Issue #131 - RestExpress.setReadTimeoutSeconds(int seconds) or setReadTimeout(long, TimeUnit) now causes RestExpress to inject a ReadTimeoutHandler into the pipeline.
-* Upgraded Jackson Databind to 2.7.4
-* Upgraded Netty to 4.1.10.Final
-* Upgraded Xstream to 1.4.9
+* Upgraded Jackson Databind to 2.8.11.3
+* Upgraded Netty to 4.1.33.Final
+* Upgraded Xstream to 1.4.11.1
+* Upgraded OWASP encoder to 1.2.2
+* Updated to compile with JDK 11 (use Base64 instead of DatatypeConverter in HttpBasicAuthenticationPreprocessor).
 
 Release 0.11.3 - 10 Feb 2016
 ----------------------------

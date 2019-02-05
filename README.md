@@ -50,8 +50,9 @@ Note that to use the SNAPSHOT version, you must enable snapshots and a repositor
   </profiles>
 ```
 
-## A quick tutorial:
-====================
+A quick tutorial:
+=================
+
 Please see the Maven Archetypes at https://github.com/RestExpress/RestExpress-Archetype for kick-starting your API.
 
 * HTTP Methods, if not changed in the fluent (DSL) interface, map to the following:

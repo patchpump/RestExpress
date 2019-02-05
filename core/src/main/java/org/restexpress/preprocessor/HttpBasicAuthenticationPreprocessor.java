@@ -15,9 +15,7 @@
  */
 package org.restexpress.preprocessor;
 
-import javax.xml.bind.DatatypeConverter;
-
-import io.netty.handler.codec.http.HttpHeaderNames;
+import java.util.Base64;
 
 import org.restexpress.ContentType;
 import org.restexpress.Flags;
@@ -25,6 +23,8 @@ import org.restexpress.Request;
 import org.restexpress.exception.UnauthorizedException;
 import org.restexpress.pipeline.Preprocessor;
 import org.restexpress.route.Route;
+
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 /**
  * This preprocessor implements HTTP Basic authentication. It simply parses the
@@ -119,19 +119,27 @@ implements Preprocessor
 		}
 
 		String[] pieces = authorization.split(" ");
-		byte[] bytes = DatatypeConverter.parseBase64Binary(pieces[1]);
-		String credentials = new String(bytes, ContentType.CHARSET);
-		String[] parts = credentials.split(":");
 
-		if (parts.length < 2)
+		try
+		{
+			byte[] bytes = Base64.getDecoder().decode(pieces[1]);
+			String credentials = new String(bytes, ContentType.CHARSET);
+			String[] parts = credentials.split(":");
+	
+			if (parts.length < 2)
+			{
+				throwUnauthorizedException();
+			}
+			
+			request.addHeader(X_AUTHENTICATED_USER, parts[0]);
+			request.addHeader(X_AUTHENTICATED_PASSWORD, parts[1]);
+			request.putAttachment(X_AUTHENTICATED_USER, parts[0]);
+			request.putAttachment(X_AUTHENTICATED_PASSWORD, parts[1]);
+		}
+		catch(IllegalArgumentException e)
 		{
 			throwUnauthorizedException();
 		}
-
-		request.addHeader(X_AUTHENTICATED_USER, parts[0]);
-		request.addHeader(X_AUTHENTICATED_PASSWORD, parts[1]);
-		request.putAttachment(X_AUTHENTICATED_USER, parts[0]);
-		request.putAttachment(X_AUTHENTICATED_PASSWORD, parts[1]);
 	}
 
 	private void throwUnauthorizedException()

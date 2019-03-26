@@ -68,11 +68,21 @@ public abstract class Environment
 	protected void load(String filename)
 	throws ConfigurationException, FileNotFoundException, IOException
 	{
-//		log.debug("loading environment properties from " + environmentFile);
 		Properties p = readProperties(filename);
+		loadEnvironmentVariables(p);
 		fillValues(p);
 	}
 	
+	private void loadEnvironmentVariables(Properties p)
+	{
+		p.putAll(System.getenv());
+	}
+
+	/**
+	 * This method pulls out the Environment properties into the service.
+	 * @param p
+	 * @throws ConfigurationException
+	 */
 	protected abstract void fillValues(Properties p)
 	throws ConfigurationException;
 

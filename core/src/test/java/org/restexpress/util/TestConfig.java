@@ -27,6 +27,7 @@ public class TestConfig
 extends Environment
 {
 	private String fromWhere;
+	private String path;
 
 	public TestConfig()
 	{
@@ -37,10 +38,16 @@ extends Environment
     protected void fillValues(Properties p) throws ConfigurationException
     {
 		fromWhere = p.getProperty("where");
+		path = p.getProperty("PATH");
     }
 
 	public String fromWhere()
 	{
 		return fromWhere;
+	}
+
+	public String getPath()
+	{
+		return path;
 	}
 }

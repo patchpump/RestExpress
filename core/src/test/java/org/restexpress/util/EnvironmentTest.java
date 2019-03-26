@@ -39,6 +39,16 @@ public class EnvironmentTest
 	}
 
 	@Test
+	public void shouldLoadFromEnvVars()
+	throws FileNotFoundException, IOException
+	{
+		TestConfig e = Environment.fromDefault(TestConfig.class);
+		assertNotNull(e);
+		String cp = e.getPath();
+		assertNotNull(cp);
+	}
+
+	@Test
 	public void shouldAttemptLoadingFromFileSystem()
 	throws IOException
 	{

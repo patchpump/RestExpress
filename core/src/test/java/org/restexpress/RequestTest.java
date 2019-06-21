@@ -236,7 +236,7 @@ public class RequestTest
 		assertEquals(HttpMethod.POST, deleteRequest.getHttpMethod());
 		assertEquals(HttpMethod.POST, deleteRequest.getEffectiveHttpMethod());
 	}
-	
+
 	@Test
 	public void shouldParseUrlFormEncodedBody()
 	throws Exception
@@ -257,7 +257,19 @@ public class RequestTest
 		assertEquals(formValue2, form.get("openid.identity").get(0));
 		assertEquals(formValue3, form.get("openid.claimed_id").get(0));
 	}
-	
+
+	@Test
+	public void shouldHandleNullUrlFormEncodedBody()
+	throws Exception
+	{
+		DefaultFullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/foo?_method=xyzt");
+		Request formPost = new Request(httpRequest, null);
+		Map<String, List<String>> form = formPost.getBodyFromUrlFormEncoded();
+		assertEquals(0, form.size());
+		form = formPost.getBodyFromUrlFormEncoded(true);
+		assertEquals(0, form.size());
+	}
+
 	@Test
 	public void shouldGetRequestHeaderNames()
 	{

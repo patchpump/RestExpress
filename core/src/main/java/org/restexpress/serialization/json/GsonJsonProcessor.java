@@ -19,10 +19,9 @@ package org.restexpress.serialization.json;
 
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.time.LocalDate;
 import java.util.Date;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
 import org.restexpress.ContentType;
 import org.restexpress.common.util.StringUtils;
 
@@ -30,6 +29,9 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.strategicgains.util.date.DateAdapterConstants;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 
 /**
  * A SerializationProcessor to handle JSON input/output using GSON. It anticipates ISO
@@ -61,6 +63,7 @@ extends JsonSerializationProcessor
 		GsonBuilder builder = new GsonBuilder()
 		    .disableHtmlEscaping()
 		    .registerTypeAdapter(Date.class, new GsonTimepointSerializer())
+		    .registerTypeAdapter(LocalDate.class, new GsonLocalDateSerializer())
 		    .setDateFormat(DateAdapterConstants.TIMESTAMP_OUTPUT_FORMAT)
 		    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
 

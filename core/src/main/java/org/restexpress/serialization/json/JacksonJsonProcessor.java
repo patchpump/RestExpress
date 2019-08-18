@@ -22,10 +22,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
 import org.restexpress.ContentType;
 import org.restexpress.Format;
 import org.restexpress.common.util.StringUtils;
@@ -41,6 +40,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.strategicgains.util.date.DateAdapterConstants;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 
 /**
  * A SerializationProcessor to handle JSON input/output. It anticipates ISO
@@ -114,7 +116,9 @@ extends JsonSerializationProcessor
     {
 		module
 			.addSerializer(Date.class, new JacksonTimepointSerializer())
-			.addDeserializer(Date.class, new JacksonTimepointDeserializer());
+			.addDeserializer(Date.class, new JacksonTimepointDeserializer())
+			.addSerializer(LocalDate.class, new JacksonLocalDateSerializer())
+			.addDeserializer(LocalDate.class, new JacksonLocalDateDeserializer());
 
 		if (shouldOutboundEncode)
 		{

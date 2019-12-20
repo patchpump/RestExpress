@@ -90,6 +90,16 @@ public class QueryOrder
 		return (sorts != null && !sorts.isEmpty());
 	}
 
+	/**
+	 * Return the count of components in the sort criteria.
+	 * 
+	 * @return the count of components in the sort criteria.
+	 */
+	public int size()
+	{
+		return (sorts != null ? sorts.size() : 0);
+	}
+
 	public void iterate(OrderCallback callback)
 	{
 		if (callback == null || !isSorted()) return;

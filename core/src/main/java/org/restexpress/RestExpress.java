@@ -29,6 +29,7 @@ import org.restexpress.exception.DefaultExceptionMapper;
 import org.restexpress.exception.ExceptionMapping;
 import org.restexpress.exception.ServiceException;
 import org.restexpress.pipeline.DefaultRequestHandler;
+import org.restexpress.pipeline.FileUploadHandler;
 import org.restexpress.pipeline.MessageObserver;
 import org.restexpress.pipeline.PipelineInitializer;
 import org.restexpress.pipeline.Postprocessor;
@@ -651,6 +652,17 @@ public class RestExpress
 		return requestHandler;
 	}
 
+	public FileUploadHandler buildFileUploadRequestHandler() {
+		FileUploadHandler fileUploadHandler = new FileUploadHandler(
+				createRouteResolver(), serializationProvider(),
+				new DefaultHttpResponseWriter(), enforceHttpSpec);
+
+		fileUploadHandler.setExceptionMap(exceptionMap);
+
+		return fileUploadHandler;
+	}
+
+
 	/**
 	 * The last call in the building of a RestExpress server, bind() causes
 	 * Netty to bind to the listening address and process incoming messages.
@@ -690,7 +702,8 @@ public class RestExpress
 		ServerBootstrap bootstrap = bootstrapFactory.newServerBootstrap(getIoThreadCount());
 		bootstrap.childHandler(new PipelineInitializer()
 			.setExecutionHandler(initializeExecutorGroup())
-		    .addRequestHandler(buildRequestHandler())
+		    .addRequestHandler("default", buildRequestHandler())
+				.addRequestHandler("fileupload", buildFileUploadRequestHandler())
 		    .setSSLContext(sslContext)
 		    .setMaxContentLength(serverSettings.getMaxContentSize())
 		    .setReadTimeout(serverSettings.getReadTimeout(), serverSettings.getReadTimeoutUnit())
@@ -749,7 +762,7 @@ public class RestExpress
 		bootstrap.childOption(ChannelOption.SO_KEEPALIVE, useKeepAlive());
 		bootstrap.childOption(ChannelOption.TCP_NODELAY, useTcpNoDelay());
 		bootstrap.childOption(ChannelOption.SO_LINGER, getSoLinger());
-		bootstrap.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true));
+//		bootstrap.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true));
 //		bootstrap.option(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
 		bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator());
 		bootstrap.childOption(ChannelOption.SO_RCVBUF, getReceiveBufferSize());

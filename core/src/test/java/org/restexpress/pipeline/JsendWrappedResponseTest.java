@@ -68,7 +68,7 @@ public class JsendWrappedResponseTest
 		httpResponse = new StringBuffer();
 		messageHandler.setResponseWriter(new StringBufferHttpResponseWriter(httpResponse));
 		PipelineInitializer pf = new PipelineInitializer()
-			.addRequestHandler(messageHandler);
+			.addRequestHandler("default", messageHandler);
         channel = new EmbeddedChannel(messageHandler);
         pl = channel.pipeline();
 	}

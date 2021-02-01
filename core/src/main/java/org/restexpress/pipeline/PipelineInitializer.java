@@ -5,6 +5,10 @@ package org.restexpress.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import io.netty.buffer.ByteBufAllocator;
@@ -37,7 +41,7 @@ extends ChannelInitializer<SocketChannel>
 
 	// SECTION: INSTANCE VARIABLES
 
-	private List<ChannelHandler> requestHandlers = new ArrayList<ChannelHandler>();
+	private Map<String, ChannelHandler> requestHandlers = new HashMap<>();
 	private int maxContentLength = DEFAULT_MAX_CONTENT_LENGTH;
 	private EventExecutorGroup eventExecutorGroup = null;
 	private SslContext sslContext = null;
@@ -54,11 +58,11 @@ extends ChannelInitializer<SocketChannel>
 
 	// SECTION: BUILDER METHODS
 
-	public PipelineInitializer addRequestHandler(ChannelHandler handler)
+	public PipelineInitializer addRequestHandler(String name, ChannelHandler handler)
 	{
-		if (!requestHandlers.contains(handler))
+		if (!requestHandlers.containsKey(name))
 		{
-			requestHandlers.add(handler);
+			requestHandlers.put(name, handler);
 		}
 
 		return this;
@@ -124,6 +128,8 @@ extends ChannelInitializer<SocketChannel>
 
 		pipeline.addLast("decoder", new HttpRequestDecoder());
 		pipeline.addLast("inflater", new HttpContentDecompressor());
+		// Routes request to either the default handler or the file upload one
+		pipeline.addLast("URLDecoder", new RequestURLDecoder());
 
 		// Outbound handlers
 		pipeline.addLast("encoder", new HttpResponseEncoder());
@@ -141,22 +147,32 @@ extends ChannelInitializer<SocketChannel>
 	}
 
 	private void addAllHandlers(ChannelPipeline pipeline)
-    {
+	{
 		if (eventExecutorGroup != null)
 		{
-			for (ChannelHandler handler : requestHandlers)
+			for (Entry<String, ChannelHandler> entry : requestHandlers.entrySet())
 			{
-				pipeline.addLast(eventExecutorGroup, handler.getClass().getSimpleName(), handler);
+				String name = entry.getKey();
+				ChannelHandler handler = entry.getValue();
+				if (name.equals("fileupload"))
+					pipeline.addBefore(eventExecutorGroup, "aggregator", handler.getClass().getSimpleName(), handler);
+				else
+					pipeline.addLast(eventExecutorGroup, handler.getClass().getSimpleName(), handler);
 			}
 		}
 		else
 		{
-		    for (ChannelHandler handler : requestHandlers)
+			for (Entry<String, ChannelHandler> entry : requestHandlers.entrySet())
 			{
-				pipeline.addLast(handler.getClass().getSimpleName(), handler);
+				String name = entry.getKey();
+				ChannelHandler handler = entry.getValue();
+				if (name.equals("fileupload"))
+					pipeline.addBefore("aggregator", handler.getClass().getSimpleName(), handler);
+				else
+					pipeline.addLast(handler.getClass().getSimpleName(), handler);
 			}
 		}
-    }
+	}
 
 	public ChannelHandler setUseCompression(boolean shouldUseCompression)
 	{

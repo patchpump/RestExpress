@@ -80,7 +80,7 @@ Release 0.12.0-SNAPSHOT (in master)
 * Issue #130 - Throw on BindException.
 * Issues #137-138 - Use char[] vs String in SslUtil (Merge request from albahrani).
 * Issue #131 - RestExpress.setReadTimeoutSeconds(int seconds) or setReadTimeout(long, TimeUnit) now causes RestExpress to inject a ReadTimeoutHandler into the pipeline.
-* Issues #145, 22 - Support for large, multi-part file uploads.
+* Issues #145, 22 - Support for large, multi-part file uploads via POST. Off by default. Call restExpressInstance.supportFileUploads(true) to enable.
 * Upgraded Jackson Databind to 2.8.11.3
 * Upgraded Netty to 4.1.34.Final
 * Upgraded Xstream to 1.4.11.1

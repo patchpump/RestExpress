@@ -433,6 +433,7 @@ public class RestExpressTest
 	@Test
 	public void shouldUploadFile() throws Throwable {
 		RestExpress re = new RestExpress();
+		re.setSupportFileUpload(true);
 		NoopController controller = new NoopController();
 		re.uri(TEST_PATH, controller);
 		re.bind(TEST_PORT);
@@ -453,8 +454,14 @@ public class RestExpressTest
 		post.setEntity(entity);
 		HttpResponse response = (HttpResponse) client.execute(post);
 
-		assertEquals(201, response.getStatusLine().getStatusCode());
-		post.releaseConnection();
+		try
+		{
+			assertEquals(201, response.getStatusLine().getStatusCode());
+		}
+		finally
+		{
+			post.releaseConnection();
+		}
 	}
 
 	public class NoopController

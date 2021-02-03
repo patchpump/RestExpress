@@ -79,12 +79,13 @@ public class RestExpress
 //		ResourceLeakDetector.setLevel(Level.DISABLED);
 //	}
 
-    private static final ChannelGroup allChannels = new DefaultChannelGroup("RestExpress", GlobalEventExecutor.INSTANCE);
-
+	public static final String DEFAULT_HANDLER_NAME = "default";
+	public static final String FILEUPLOAD_HANDLER_NAME = "fileupload";
 	public static final String DEFAULT_NAME = "RestExpress";
+    private static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup(DEFAULT_NAME, GlobalEventExecutor.INSTANCE);
 	public static final int DEFAULT_PORT = 8081;
 
-	private static SerializationProvider DEFAULT_SERIALIZATION_PROVIDER = null;
+	private static SerializationProvider defaultSerializationProvider = null;
 
 	private SocketSettings socketSettings = new SocketSettings();
 	private ServerSettings serverSettings = new ServerSettings();
@@ -93,12 +94,12 @@ public class RestExpress
 	private boolean useSystemOut;
 	private ServerBootstrapFactory bootstrapFactory = new ServerBootstrapFactory();
 
-	private List<MessageObserver> messageObservers = new ArrayList<MessageObserver>();
-	private List<Preprocessor> preprocessors = new ArrayList<Preprocessor>();
-	private List<Postprocessor> postprocessors = new ArrayList<Postprocessor>();
-	private List<Postprocessor> finallyProcessors = new ArrayList<Postprocessor>();
+	private List<MessageObserver> messageObservers = new ArrayList<>();
+	private List<Preprocessor> preprocessors = new ArrayList<>();
+	private List<Postprocessor> postprocessors = new ArrayList<>();
+	private List<Postprocessor> finallyProcessors = new ArrayList<>();
 	private ExceptionMapping exceptionMap = new DefaultExceptionMapper();
-	private List<Plugin> plugins = new ArrayList<Plugin>();
+	private List<Plugin> plugins = new ArrayList<>();
 	private RouteDeclaration routeDeclarations = new RouteDeclaration();
 	private SslContext sslContext = null;
 	private SerializationProvider serializationProvider = null;
@@ -111,6 +112,7 @@ public class RestExpress
 	 * @param provider a SerializationProvider instance.
 	 * @deprecated use setDefaultSerializationProvider()
 	 */
+	@Deprecated(forRemoval = true)
 	public static void setSerializationProvider(SerializationProvider provider)
 	{
 		setDefaultSerializationProvider(provider);
@@ -120,6 +122,7 @@ public class RestExpress
 	 * @return the default serialization provider.
 	 * @deprecated Use getDefaultSerializationProvider()
 	 */
+	@Deprecated(forRemoval = true)
 	public static SerializationProvider getSerializationProvider()
 	{
 		return getDefaultSerializationProvider();
@@ -134,7 +137,7 @@ public class RestExpress
 	 */
 	public static void setDefaultSerializationProvider(SerializationProvider provider)
 	{
-		DEFAULT_SERIALIZATION_PROVIDER = provider;
+		defaultSerializationProvider = provider;
 	}
 
 	/**
@@ -146,12 +149,12 @@ public class RestExpress
 	 */
 	public static SerializationProvider getDefaultSerializationProvider()
 	{
-		if (DEFAULT_SERIALIZATION_PROVIDER == null)
+		if (defaultSerializationProvider == null)
 		{
-			DEFAULT_SERIALIZATION_PROVIDER = new DefaultSerializationProvider();
+			defaultSerializationProvider = new DefaultSerializationProvider();
 		}
 
-		return DEFAULT_SERIALIZATION_PROVIDER;
+		return defaultSerializationProvider;
 	}
 
 	/**
@@ -476,6 +479,12 @@ public class RestExpress
 		return serverSettings.shouldUseCompression();
 	}
 
+	public RestExpress setSupportFileUpload(boolean value)
+	{
+		serverSettings.setSupportFileUpload(value);
+		return this;
+	}
+
 	public int getSoLinger()
 	{
 		return socketSettings.getSoLinger();
@@ -700,14 +709,21 @@ public class RestExpress
 	throws Throwable
 	{
 		ServerBootstrap bootstrap = bootstrapFactory.newServerBootstrap(getIoThreadCount());
-		bootstrap.childHandler(new PipelineInitializer()
+		PipelineInitializer pi = new PipelineInitializer()
 			.setExecutionHandler(initializeExecutorGroup())
-		    .addRequestHandler("default", buildRequestHandler())
-				.addRequestHandler("fileupload", buildFileUploadRequestHandler())
+		    .addRequestHandler(DEFAULT_HANDLER_NAME, buildRequestHandler())
 		    .setSSLContext(sslContext)
 		    .setMaxContentLength(serverSettings.getMaxContentSize())
 		    .setReadTimeout(serverSettings.getReadTimeout(), serverSettings.getReadTimeoutUnit())
-		    .setUseCompression(serverSettings.shouldUseCompression()));
+		    .setUseCompression(serverSettings.shouldUseCompression());
+
+		if (serverSettings.isSupportFileUpload())
+		{
+			pi.setSupportFileUpload(true)
+				.addRequestHandler(FILEUPLOAD_HANDLER_NAME, buildFileUploadRequestHandler());
+		}
+		
+		bootstrap.childHandler(pi);
 
 		setBootstrapOptions(bootstrap);
 
@@ -724,7 +740,7 @@ public class RestExpress
 			public void operationComplete(ChannelFuture future)
 			throws Exception
 			{
-				allChannels.add(future.channel());
+				ALL_CHANNELS.add(future.channel());
 			}
 		});
 
@@ -756,14 +772,13 @@ public class RestExpress
 		bootstrap.option(ChannelOption.SO_REUSEADDR, shouldReuseAddress());
 		bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, getConnectTimeoutMillis());
 		bootstrap.option(ChannelOption.SO_RCVBUF, getReceiveBufferSize());
-//		bootstrap.option(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
 		bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator());
 
 		bootstrap.childOption(ChannelOption.SO_KEEPALIVE, useKeepAlive());
 		bootstrap.childOption(ChannelOption.TCP_NODELAY, useTcpNoDelay());
 		bootstrap.childOption(ChannelOption.SO_LINGER, getSoLinger());
-//		bootstrap.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true));
-//		bootstrap.option(ChannelOption.MAX_MESSAGES_PER_READ, Integer.MAX_VALUE);
+		//TODO: Investigate re. memory leak.
+		bootstrap.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true));
 		bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator());
 		bootstrap.childOption(ChannelOption.SO_RCVBUF, getReceiveBufferSize());
 		bootstrap.childOption(ChannelOption.SO_REUSEADDR, shouldReuseAddress());
@@ -817,7 +832,7 @@ public class RestExpress
 	 */
 	public void shutdown(boolean shouldWait)
 	{
-		ChannelGroupFuture channelFuture = allChannels.close();
+		ChannelGroupFuture channelFuture = ALL_CHANNELS.close();
 		bootstrapFactory.shutdownGracefully(shouldWait);
 		channelFuture.awaitUninterruptibly();
 		shutdownPlugins();
@@ -841,9 +856,6 @@ public class RestExpress
 		ServerMetadata m = new ServerMetadata();
 		m.setName(getName());
 		m.setPort(getPort());
-		// TODO: create a good substitute for this...
-		// m.setDefaultFormat(getDefaultFormat());
-		// m.addAllSupportedFormats(getResponseProcessors().keySet());
 		m.addAllRoutes(routeDeclarations.getMetadata());
 		return m;
 	}
@@ -861,20 +873,15 @@ public class RestExpress
 	 */
 	public Map<String, String> getRouteUrlsByName()
 	{
-		final Map<String, String> urlsByName = new HashMap<String, String>();
+		final Map<String, String> urlsByName = new HashMap<>();
 
-		iterateRouteBuilders(new Callback<RouteBuilder>()
-		{
-			@Override
-			public void process(RouteBuilder routeBuilder)
+		iterateRouteBuilders(routeBuilder -> {
+			RouteMetadata route = routeBuilder.asMetadata();
+
+			if (route.getName() != null)
 			{
-				RouteMetadata route = routeBuilder.asMetadata();
-
-				if (route.getName() != null)
-				{
-					urlsByName.put(route.getName(), getBaseUrl()
-					    + route.getUri().getPattern().replace(".{format}", ""));
-				}
+				urlsByName.put(route.getName(), getBaseUrl()
+				    + route.getUri().getPattern().replace(".{format}", ""));
 			}
 		});
 

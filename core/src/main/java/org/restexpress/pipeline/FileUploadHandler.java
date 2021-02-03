@@ -1,16 +1,40 @@
-/***
- * @author - Murali S Rao
- *
- * An upload handler to handle large file uploads in Rest Express.
- * Involves adding a decoder to "divert" POST Multipart requests towards this handler
- * and pass the rest of messages to the Default Request Handler. (See RequestURLDecoder.java)
- *
- * The controller can access the file received by this handler
- * by retrieving the path of the file using an "attachment" named "FILE_ATTACHMENT_KEY"
- *
- */
+/*
+    Copyright 2021, Strategic Gains, Inc.
 
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+ */
 package org.restexpress.pipeline;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+import org.restexpress.ContentType;
+import org.restexpress.Request;
+import org.restexpress.Response;
+import org.restexpress.exception.DefaultExceptionMapper;
+import org.restexpress.exception.ExceptionMapping;
+import org.restexpress.exception.ServiceException;
+import org.restexpress.response.HttpResponseWriter;
+import org.restexpress.route.Action;
+import org.restexpress.route.RouteResolver;
+import org.restexpress.serialization.DefaultSerializationProvider;
+import org.restexpress.serialization.SerializationProvider;
+import org.restexpress.serialization.SerializationSettings;
+import org.restexpress.util.HttpSpecification;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -33,304 +57,308 @@ import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDec
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.util.AttributeKey;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.UUID;
-import org.restexpress.ContentType;
-import org.restexpress.Request;
-import org.restexpress.Response;
-import org.restexpress.exception.DefaultExceptionMapper;
-import org.restexpress.exception.ExceptionMapping;
-import org.restexpress.exception.ServiceException;
-import org.restexpress.response.HttpResponseWriter;
-import org.restexpress.route.Action;
-import org.restexpress.route.RouteResolver;
-import org.restexpress.serialization.DefaultSerializationProvider;
-import org.restexpress.serialization.SerializationProvider;
-import org.restexpress.serialization.SerializationSettings;
-import org.restexpress.util.HttpSpecification;
 
+/***
+ * @author - Murali S Rao
+ *
+ * An upload handler to handle large file uploads in Rest Express.
+ * Involves adding a decoder to "divert" POST Multipart requests towards this handler
+ * and pass the rest of messages to the Default Request Handler. (See RequestURLDecoder.java)
+ *
+ * The controller can access the file received by this handler
+ * by retrieving the path of the file using an "attachment" named "FILE_ATTACHMENT_KEY"
+ *
+ */
 @Sharable
-public class FileUploadHandler extends SimpleChannelInboundHandler<HttpObject>  {
+public class FileUploadHandler
+extends SimpleChannelInboundHandler<HttpObject>
+{
 
-  private static final AttributeKey<MessageContext> CONTEXT_KEY = AttributeKey.valueOf("context");
-  private static final String FILE_ATTACHMENT_KEY = "filePath";
-  private final RouteResolver routeResolver;
-  private final SerializationProvider serializationProvider;
-  private HttpResponseWriter responseWriter;
-  private HttpPostRequestDecoder decoder;
-  private static final HttpDataFactory factory =
-      new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
-  private File filePath;
-  private boolean shouldEnforceHttpSpec = true;
-  private final List<Preprocessor> preprocessors = new ArrayList<Preprocessor>();
-  private static SerializationProvider DEFAULT_SERIALIZATION_PROVIDER = null;
-  // Save a reference to request and the context since we accumulate chunks in between
-  private FullHttpRequest fullHttpRequest = null;
-  private MessageContext messageContext = null;
-  private ExceptionMapping exceptionMap = new DefaultExceptionMapper();
+	private static final AttributeKey<MessageContext> CONTEXT_KEY = AttributeKey.valueOf("context");
+	private static final String FILE_ATTACHMENT_KEY = "filePath";
+	private final RouteResolver routeResolver;
+	private final SerializationProvider serializationProvider;
+	private HttpResponseWriter responseWriter;
+	private HttpPostRequestDecoder decoder;
+	private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
+	private File filePath;
+	private boolean shouldEnforceHttpSpec = true;
+	private static SerializationProvider DEFAULT_SERIALIZATION_PROVIDER = null;
 
-  public FileUploadHandler(RouteResolver routeResolver, SerializationProvider serializationProvider,
-      HttpResponseWriter responseWriter, boolean enforceHttpSpec)
-  {
-    super();
-    this.routeResolver = routeResolver;
-    this.serializationProvider = serializationProvider;
-    setResponseWriter(responseWriter);
-    this.shouldEnforceHttpSpec = enforceHttpSpec;
-  }
+	// Save a reference to request and the context since we accumulate chunks in between
+	private FullHttpRequest fullHttpRequest = null;
+	private MessageContext messageContext = null;
+	private ExceptionMapping exceptionMap = new DefaultExceptionMapper();
 
-  @Override
-  public void channelReadComplete(ChannelHandlerContext ctx) throws Exception{
-    ctx.flush();
-    super.channelReadComplete(ctx);
-  }
+	public FileUploadHandler(RouteResolver routeResolver, SerializationProvider serializationProvider, HttpResponseWriter responseWriter, boolean enforceHttpSpec)
+	{
+		super();
+		this.routeResolver = routeResolver;
+		this.serializationProvider = serializationProvider;
+		setResponseWriter(responseWriter);
+		this.shouldEnforceHttpSpec = enforceHttpSpec;
+	}
 
-  public void channelRead0(ChannelHandlerContext channelHandlerContext,
-      HttpObject object) throws Exception {
+	@Override
+	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception
+	{
+		ctx.flush();
+		super.channelReadComplete(ctx);
+	}
 
-    try {
-      processRequest(channelHandlerContext, object);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
+	public void channelRead0(ChannelHandlerContext channelHandlerContext, HttpObject object)
+	throws Exception
+	{
+		try
+		{
+			processRequest(channelHandlerContext, object);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
-  private void processRequest(ChannelHandlerContext channelHandlerContext, HttpObject object) {
-    if (object instanceof HttpRequest) {
-      HttpRequest request = (HttpRequest) object;
-      fullHttpRequest = new DefaultFullHttpRequest(request.getProtocolVersion(),
-          request.getMethod(),
-          request.getUri());
-      fullHttpRequest.headers().set(request.headers());
-      String uuid = UUID.randomUUID().toString();
-      filePath = Paths.get(System.getProperty("java.io.tmpdir"), uuid).toFile();
-      messageContext = createInitialContext(channelHandlerContext, fullHttpRequest);
+	private void processRequest(ChannelHandlerContext channelHandlerContext, HttpObject object)
+	{
+		if (object instanceof HttpRequest)
+		{
+			HttpRequest request = (HttpRequest) object;
+			fullHttpRequest = new DefaultFullHttpRequest(request.protocolVersion(), request.method(), request.uri());
+			fullHttpRequest.headers().set(request.headers());
+			String uuid = UUID.randomUUID().toString();
+			filePath = Paths.get(System.getProperty("java.io.tmpdir"), uuid).toFile();
+			messageContext = createInitialContext(channelHandlerContext, fullHttpRequest);
 
-      try {
-        decoder = new HttpPostRequestDecoder(factory, request);
-      } catch (ErrorDataDecoderException e1) {
-        e1.printStackTrace();
-        channelHandlerContext.channel().close();
-        return;
-      }
-    }
+			try
+			{
+				decoder = new HttpPostRequestDecoder(factory, request);
+			}
+			catch (ErrorDataDecoderException e1)
+			{
+				e1.printStackTrace();
+				channelHandlerContext.channel().close();
+				return;
+			}
+		}
 
-    if (object instanceof HttpContent) {
-      HttpContent chunk = (HttpContent) object;
-      decoder.offer(chunk);
-      readChunk();
-      if (object instanceof LastHttpContent) {
-        prepareResponse(channelHandlerContext);
-        reset();
-      }
-    }
-  }
+		if (object instanceof HttpContent)
+		{
+			HttpContent chunk = (HttpContent) object;
+			decoder.offer(chunk);
+			readChunk();
 
-  private void prepareResponse(ChannelHandlerContext channelHandlerContext) {
-    resolveRoute(messageContext);
-    resolveResponseProcessor(messageContext);
-    messageContext.getRequest().putAttachment(FILE_ATTACHMENT_KEY, filePath.getAbsolutePath());
-    Object result = messageContext.getAction().invoke(messageContext.getRequest(), messageContext.getResponse());
+			if (object instanceof LastHttpContent)
+			{
+				prepareResponse(channelHandlerContext);
+				reset();
+			}
+		}
+	}
 
-    if (result != null) {
-      messageContext.getResponse().setBody(result);
-    }
+	private void prepareResponse(ChannelHandlerContext channelHandlerContext)
+	{
+		resolveRoute(messageContext);
+		resolveResponseProcessor(messageContext);
+		messageContext.getRequest().putAttachment(FILE_ATTACHMENT_KEY, filePath.getAbsolutePath());
+		Object result = messageContext.getAction().invoke(messageContext.getRequest(), messageContext.getResponse());
 
-    serializeResponse(messageContext, false);
-    enforceHttpSpecification(messageContext);
-    writeResponse(channelHandlerContext, messageContext);
-  }
+		if (result != null)
+		{
+			messageContext.getResponse().setBody(result);
+		}
 
-  private void reset() {
-    // destroy the decoder to release all resources
-    decoder.destroy();
-    decoder = null;
-    fullHttpRequest = null;
-    messageContext = null;
-  }
+		serializeResponse(messageContext, false);
+		enforceHttpSpecification(messageContext);
+		writeResponse(channelHandlerContext, messageContext);
+	}
 
-  private void readChunk() {
-    try {
-      while (decoder.hasNext()) {
-        InterfaceHttpData data = decoder.next();
-        if (data != null) {
-          try {
-            writeData(data);
-          } finally {
-            data.release();
-          }
-        }
-      }
-    } catch (EndOfDataDecoderException e) {
-      e.printStackTrace();
-    }
-  }
+	private void reset()
+	{
+		// destroy the decoder to release all resources
+		decoder.destroy();
+		decoder = null;
+		fullHttpRequest = null;
+		messageContext = null;
+	}
 
-  private void writeData(InterfaceHttpData data) {
-    if (data.getHttpDataType() == HttpDataType.Attribute) {
-      Attribute attribute = (Attribute)data;
-      String value;
-      try {
-        value = attribute.getValue();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+	private void readChunk()
+	{
+		try
+		{
+			while (decoder.hasNext())
+			{
+				InterfaceHttpData data = decoder.next();
+				if (data != null)
+				{
+					try
+					{
+						writeData(data);
+					}
+					finally
+					{
+						data.release();
+					}
+				}
+			}
+		}
+		catch (EndOfDataDecoderException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
-    } else {
-      FileUpload fileUpload = (FileUpload) data;
-      if (fileUpload.isCompleted()) {
-        try {
-          fileUpload.renameTo(filePath);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-  }
+	private void writeData(InterfaceHttpData data)
+	{
+		if (data.getHttpDataType() == HttpDataType.Attribute)
+		{
+			Attribute attribute = (Attribute) data;
+			String value;
+			try
+			{
+				value = attribute.getValue();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 
-  private MessageContext createInitialContext(ChannelHandlerContext ctx, FullHttpRequest httpRequest)
-  {
-    Request request = createRequest(httpRequest, ctx);
-    Response response = createResponse();
-    MessageContext context = new MessageContext(request, response);
-    ctx.attr(CONTEXT_KEY).set(context);
-    return context;
-  }
+		}
+		else
+		{
+			FileUpload fileUpload = (FileUpload) data;
 
-  public HttpResponseWriter getResponseWriter()
-  {
-    return this.responseWriter;
-  }
+			if (fileUpload.isCompleted())
+			{
+				try
+				{
+					fileUpload.renameTo(filePath);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
-  public void setResponseWriter(HttpResponseWriter writer)
-  {
-    this.responseWriter = writer;
-  }
+	private MessageContext createInitialContext(ChannelHandlerContext ctx, FullHttpRequest httpRequest)
+	{
+		Request request = createRequest(httpRequest, ctx);
+		Response response = createResponse();
+		MessageContext context = new MessageContext(request, response);
+		ctx.attr(CONTEXT_KEY).set(context);
+		return context;
+	}
 
-  private Request createRequest(FullHttpRequest request, ChannelHandlerContext context)
-  {
-    try
-    {
-      return new Request((InetSocketAddress) context.channel().remoteAddress(), request, routeResolver, serializationProvider);
-    }
-    catch(Throwable t)
-    {
-      return new Request(request, routeResolver, serializationProvider);
-    }
-  }
+	public HttpResponseWriter getResponseWriter()
+	{
+		return this.responseWriter;
+	}
 
-  private Response createResponse()
-  {
-    return new Response();
-  }
+	public void setResponseWriter(HttpResponseWriter writer)
+	{
+		this.responseWriter = writer;
+	}
 
-  private void writeResponse(ChannelHandlerContext ctx, MessageContext context)
-  {
-    getResponseWriter().write(ctx, context.getRequest(), context.getResponse());
-  }
+	private Request createRequest(FullHttpRequest request, ChannelHandlerContext context)
+	{
+		try
+		{
+			return new Request((InetSocketAddress) context.channel().remoteAddress(), request,
+			    routeResolver, serializationProvider);
+		}
+		catch (Throwable t)
+		{
+			return new Request(request, routeResolver, serializationProvider);
+		}
+	}
 
-  private void resolveResponseProcessor(MessageContext context)
-  {
-    SerializationSettings s = serializationProvider.resolveResponse(context.getRequest(), context.getResponse(), false);
-    context.setSerializationSettings(s);
-  }
+	private Response createResponse()
+	{
+		return new Response();
+	}
 
-  private void resolveRoute(MessageContext context)
-  {
-    Action action = routeResolver.resolve(context.getRequest());
-    context.setAction(action);
-  }
+	private void writeResponse(ChannelHandlerContext ctx, MessageContext context)
+	{
+		getResponseWriter().write(ctx, context.getRequest(), context.getResponse());
+	}
 
-  private void enforceHttpSpecification(MessageContext context)
-  {
-    if (shouldEnforceHttpSpec)
-    {
-      HttpSpecification.enforce(context.getResponse());
-    }
-  }
+	private void resolveResponseProcessor(MessageContext context)
+	{
+		SerializationSettings s = serializationProvider.resolveResponse(context.getRequest(), context.getResponse(), false);
+		context.setSerializationSettings(s);
+	}
 
-  private void serializeResponse(MessageContext context, boolean force)
-  {
-    Response response = context.getResponse();
+	private void resolveRoute(MessageContext context)
+	{
+		Action action = routeResolver.resolve(context.getRequest());
+		context.setAction(action);
+	}
 
-    if (HttpSpecification.isContentTypeAllowed(response))
-    {
-      SerializationSettings settings = null;
+	private void enforceHttpSpecification(MessageContext context)
+	{
+		if (shouldEnforceHttpSpec)
+		{
+			HttpSpecification.enforce(context.getResponse());
+		}
+	}
 
-      if (response.hasSerializationSettings())
-      {
-        settings = response.getSerializationSettings();
-      }
-      else if (force)
-      {
-        settings = serializationProvider.resolveResponse(context.getRequest(), response, force);
-      }
+	private void serializeResponse(MessageContext context, boolean force)
+	{
+		Response response = context.getResponse();
 
-      if (settings != null)
-      {
-        if (response.isSerialized())
-        {
-          ByteBuffer serialized = settings.serialize(response);
+		if (HttpSpecification.isContentTypeAllowed(response))
+		{
+			SerializationSettings settings = null;
 
-          if (serialized != null)
-          {
-            response.setBody(Unpooled.wrappedBuffer(serialized));
+			if (response.hasSerializationSettings())
+			{
+				settings = response.getSerializationSettings();
+			}
+			else if (force)
+			{
+				settings = serializationProvider.resolveResponse(context.getRequest(), response, force);
+			}
 
-            if (!response.hasHeader(HttpHeaders.Names.CONTENT_TYPE))
-            {
-              response.setContentType(settings.getMediaType());
-            }
-          }
-        }
-      }
+			if (settings != null)
+			{
+				if (response.isSerialized())
+				{
+					ByteBuffer serialized = settings.serialize(response);
 
-      if (!response.hasHeader(HttpHeaders.Names.CONTENT_TYPE))
-      {
-        response.setContentType(ContentType.TEXT_PLAIN);
-      }
-    }
-  }
+					if (serialized != null)
+					{
+						response.setBody(Unpooled.wrappedBuffer(serialized));
 
-  public FileUploadHandler setExceptionMap(ExceptionMapping map)
-  {
-    this.exceptionMap = map;
-    return this;
-  }
+						if (!response.hasHeader(HttpHeaders.Names.CONTENT_TYPE))
+						{
+							response.setContentType(settings.getMediaType());
+						}
+					}
+				}
+			}
 
-  /**
-   * Uses the exceptionMap to map a Throwable to a ServiceException, if possible.
-   *
-   * @param cause
-   * @return Either a ServiceException or the root cause of the exception.
-   */
-  private Throwable mapServiceException(Throwable cause)
-  {
-    if (ServiceException.isAssignableFrom(cause))
-    {
-      return cause;
-    }
+			if (!response.hasHeader(HttpHeaders.Names.CONTENT_TYPE))
+			{
+				response.setContentType(ContentType.TEXT_PLAIN);
+			}
+		}
+	}
 
-    return exceptionMap.getExceptionFor(cause);
-  }
+	public FileUploadHandler setExceptionMap(ExceptionMapping map)
+	{
+		this.exceptionMap = map;
+		return this;
+	}
 
-  public SerializationProvider getDefaultSerializationProvider()
-  {
-    if (DEFAULT_SERIALIZATION_PROVIDER == null)
-    {
-      DEFAULT_SERIALIZATION_PROVIDER = new DefaultSerializationProvider();
-    }
+	public SerializationProvider getDefaultSerializationProvider()
+	{
+		if (DEFAULT_SERIALIZATION_PROVIDER == null)
+		{
+			DEFAULT_SERIALIZATION_PROVIDER = new DefaultSerializationProvider();
+		}
 
-    return DEFAULT_SERIALIZATION_PROVIDER;
-  }
+		return DEFAULT_SERIALIZATION_PROVIDER;
+	}
 }
-

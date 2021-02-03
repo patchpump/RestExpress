@@ -3,9 +3,12 @@
  */
 package org.restexpress.pipeline;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+
+import org.restexpress.RestExpress;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
@@ -33,17 +36,19 @@ extends ChannelInitializer<SocketChannel>
 {
 	// SECTION: CONSTANTS
 
+	private static final String AGGREGATOR = "aggregator";
 	private static final int DEFAULT_MAX_CONTENT_LENGTH = 20480;
 
 	// SECTION: INSTANCE VARIABLES
 
-	private List<ChannelHandler> requestHandlers = new ArrayList<ChannelHandler>();
+	private Map<String, ChannelHandler> requestHandlers = new HashMap<>();
 	private int maxContentLength = DEFAULT_MAX_CONTENT_LENGTH;
 	private EventExecutorGroup eventExecutorGroup = null;
 	private SslContext sslContext = null;
 	private boolean useCompression = true;
 	private long readTimeout = -1L;
 	private TimeUnit readTimeoutUnit = TimeUnit.SECONDS;
+	private boolean supportFileUpload = false;
 
 	// SECTION: CONSTRUCTORS
 
@@ -54,13 +59,15 @@ extends ChannelInitializer<SocketChannel>
 
 	// SECTION: BUILDER METHODS
 
+
 	public PipelineInitializer addRequestHandler(ChannelHandler handler)
 	{
-		if (!requestHandlers.contains(handler))
-		{
-			requestHandlers.add(handler);
-		}
+		return addRequestHandler(handler.getClass().getSimpleName(), handler);
+	}
 
+	public PipelineInitializer addRequestHandler(String name, ChannelHandler handler)
+	{
+		requestHandlers.computeIfAbsent(name, k -> handler);
 		return this;
 	}
 
@@ -94,7 +101,7 @@ extends ChannelInitializer<SocketChannel>
 	public PipelineInitializer setReadTimeout(long timeout, TimeUnit timeUnit)
 	{
 		this.readTimeout = timeout;
-		this.readTimeoutUnit = TimeUnit.SECONDS;
+		this.readTimeoutUnit = timeUnit;
 		return this;
 	}
 
@@ -125,6 +132,12 @@ extends ChannelInitializer<SocketChannel>
 		pipeline.addLast("decoder", new HttpRequestDecoder());
 		pipeline.addLast("inflater", new HttpContentDecompressor());
 
+		// Routes request to either the default handler or the file upload one
+		if (supportFileUpload)
+		{
+			pipeline.addLast("URLDecoder", new RequestURLDecoder());
+		}
+
 		// Outbound handlers
 		pipeline.addLast("encoder", new HttpResponseEncoder());
 		pipeline.addLast("chunkWriter", new ChunkedWriteHandler());
@@ -135,32 +148,57 @@ extends ChannelInitializer<SocketChannel>
 		}
 
 		// Aggregator MUST be added last, otherwise results are not correct
-		pipeline.addLast("aggregator", new HttpObjectAggregator(maxContentLength));
+		pipeline.addLast(AGGREGATOR, new HttpObjectAggregator(maxContentLength));
 
 		addAllHandlers(pipeline);
 	}
 
 	private void addAllHandlers(ChannelPipeline pipeline)
-    {
-		if (eventExecutorGroup != null)
+	{
+		for (Entry<String, ChannelHandler> entry : requestHandlers.entrySet())
 		{
-			for (ChannelHandler handler : requestHandlers)
-			{
-				pipeline.addLast(eventExecutorGroup, handler.getClass().getSimpleName(), handler);
-			}
-		}
-		else
-		{
-		    for (ChannelHandler handler : requestHandlers)
-			{
-				pipeline.addLast(handler.getClass().getSimpleName(), handler);
-			}
-		}
-    }
+			String name = entry.getKey();
+			ChannelHandler handler = entry.getValue();
 
-	public ChannelHandler setUseCompression(boolean shouldUseCompression)
+			if (supportFileUpload && isFileUploadHandler(name))
+			{
+				if (eventExecutorGroup != null)
+				{
+					pipeline.addBefore(eventExecutorGroup, AGGREGATOR, handler.getClass().getSimpleName(), handler);
+				}
+				else
+				{
+					pipeline.addBefore(AGGREGATOR, handler.getClass().getSimpleName(), handler);
+				}
+			}
+			else
+			{
+				if (eventExecutorGroup != null)
+				{
+					pipeline.addLast(eventExecutorGroup, handler.getClass().getSimpleName(), handler);
+				}
+				else
+				{
+					pipeline.addLast(handler.getClass().getSimpleName(), handler);
+				}
+			}
+		}
+	}
+
+	public PipelineInitializer setUseCompression(boolean shouldUseCompression)
 	{
 		this.useCompression = shouldUseCompression;
 		return this;
+	}
+
+	public PipelineInitializer setSupportFileUpload(boolean shouldSupportFileUpload)
+	{
+		this.supportFileUpload = shouldSupportFileUpload;
+		return this;
+	}
+
+	private boolean isFileUploadHandler(String name)
+	{
+		return RestExpress.FILEUPLOAD_HANDLER_NAME.equals(name);
 	}
 }

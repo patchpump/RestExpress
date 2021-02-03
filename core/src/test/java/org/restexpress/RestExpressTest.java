@@ -18,11 +18,16 @@ package org.restexpress;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.BindException;
 
+import java.util.UUID;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
@@ -30,6 +35,8 @@ import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.AfterClass;
@@ -420,6 +427,40 @@ public class RestExpressTest
 		finally
 		{
 			re.shutdown();
+		}
+	}
+
+	@Test
+	public void shouldUploadFile() throws Throwable {
+		RestExpress re = new RestExpress();
+		re.setSupportFileUpload(true);
+		NoopController controller = new NoopController();
+		re.uri(TEST_PATH, controller);
+		re.bind(TEST_PORT);
+
+		HttpClient client = new DefaultHttpClient();
+		int port = nextPort();
+		String testUrl = createUrl(TEST_URL_PATTERN, port);
+		HttpPost post = new HttpPost(testUrl);
+		post.addHeader("log_id", UUID.randomUUID().toString());
+		RandomAccessFile rf = new RandomAccessFile("file1", "rw");
+		rf.setLength(50 * 1024);
+		rf.close();
+		File f1 = new File("file1");
+		MultipartEntityBuilder ab = MultipartEntityBuilder.create();
+		FileBody fileBody = new FileBody(f1, org.apache.http.entity.ContentType.DEFAULT_BINARY);
+		ab.addPart("upload", fileBody);
+		HttpEntity entity = ab.build();
+		post.setEntity(entity);
+		HttpResponse response = (HttpResponse) client.execute(post);
+
+		try
+		{
+			assertEquals(201, response.getStatusLine().getStatusCode());
+		}
+		finally
+		{
+			post.releaseConnection();
 		}
 	}
 

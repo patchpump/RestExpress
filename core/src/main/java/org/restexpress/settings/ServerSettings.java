@@ -35,6 +35,7 @@ public class ServerSettings
 	private int maxContentSize = DEFAULT_MAX_CONTENT_SIZE;
 	private long readTimeout = -1L;
 	private TimeUnit readTimeoutUnit = TimeUnit.SECONDS;
+	private boolean supportFileUpload = false;
 
 	// This controls the number of concurrent connections the application can
 	// handle.
@@ -157,6 +158,16 @@ public class ServerSettings
 	public void setReadTimeoutSeconds(int timeoutSeconds)
 	{
 		setReadTimeoutSeconds(timeoutSeconds, TimeUnit.SECONDS);
+	}
+
+	public void setSupportFileUpload(boolean value)
+	{
+		this.supportFileUpload = value;
+	}
+
+	public boolean isSupportFileUpload()
+	{
+		return supportFileUpload;
 	}
 
 	public void setReadTimeoutSeconds(long timeout, TimeUnit unit)

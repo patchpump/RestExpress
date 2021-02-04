@@ -17,16 +17,7 @@
 
 package org.restexpress;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http.HttpUtil;
-
+import java.io.File;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
@@ -40,11 +31,22 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.restexpress.exception.BadRequestException;
+import org.restexpress.pipeline.FileUploadHandler;
 import org.restexpress.route.Route;
 import org.restexpress.route.RouteResolver;
 import org.restexpress.serialization.SerializationProvider;
 import org.restexpress.serialization.SerializationSettings;
 import org.restexpress.url.QueryStringParser;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 /**
  * @author toddf
@@ -635,6 +637,12 @@ public class Request
 		}
 		
 		return null;
+	}
+
+	public File getUploadedFileAttachment()
+	{
+		String filePath = (String) getAttachment(FileUploadHandler.FILE_ATTACHMENT_KEY);
+		return (filePath != null ? new File(filePath) : null);
 	}
 
 	/**

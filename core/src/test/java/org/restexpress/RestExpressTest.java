@@ -15,7 +15,7 @@
 */
 package org.restexpress;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 
 import java.io.File;
@@ -42,6 +42,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.restexpress.exception.NoRoutesDefinedException;
+import org.restexpress.pipeline.FileUploadHandler;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
@@ -435,7 +436,8 @@ public class RestExpressTest
 		RestExpress re = new RestExpress();
 		re.setSupportFileUpload(true);
 		NoopController controller = new NoopController();
-		re.uri(TEST_PATH, controller);
+		re.uri(TEST_PATH, controller)
+			.action("upload", HttpMethod.POST);
 		re.bind(TEST_PORT);
 
 		HttpClient client = new DefaultHttpClient();
@@ -457,6 +459,10 @@ public class RestExpressTest
 		try
 		{
 			assertEquals(201, response.getStatusLine().getStatusCode());
+			File f = controller.uploaded;
+			assertTrue(f.exists());
+			assertTrue(f.canRead());
+			assertEquals((50*1024), f.length());
 		}
 		finally
 		{
@@ -468,6 +474,7 @@ public class RestExpressTest
     {
 		int create, read, update, delete, options, head, patch = 0;
 		String outputMediaType;
+		File uploaded;
 
 		public void create(Request req, Response res)
 		{
@@ -507,6 +514,12 @@ public class RestExpressTest
 		public void patch(Request req, Response res)
 		{
 			++patch;
+		}
+
+		public void upload(Request req, Response res)
+		{
+			uploaded = req.getUploadedFileAttachment();
+			res.setResponseCreated();
 		}
     }
 

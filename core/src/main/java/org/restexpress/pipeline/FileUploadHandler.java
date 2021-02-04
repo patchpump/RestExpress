@@ -75,7 +75,7 @@ extends SimpleChannelInboundHandler<HttpObject>
 {
 
 	private static final AttributeKey<MessageContext> CONTEXT_KEY = AttributeKey.valueOf("context");
-	private static final String FILE_ATTACHMENT_KEY = "filePath";
+	public static final String FILE_ATTACHMENT_KEY = "filePath";
 	private final RouteResolver routeResolver;
 	private final SerializationProvider serializationProvider;
 	private HttpResponseWriter responseWriter;

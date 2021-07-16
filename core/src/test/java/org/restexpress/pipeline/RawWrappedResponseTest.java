@@ -97,30 +97,6 @@ public class RawWrappedResponseTest
 	}
 
 	@Test
-	public void shouldWrapGetInRawXml()
-	{
-		sendEvent(HttpMethod.GET, "/normal_get.xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Normal GET action</string>", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapGetInRawXmlUsingQueryString()
-	{
-		sendEvent(HttpMethod.GET, "/normal_get?format=xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Normal GET action</string>", httpResponse.toString());
-	}
-
-	@Test
 	public void shouldWrapPutInRawJson()
 	{
 		sendEvent(HttpMethod.PUT, "/normal_put.json", "");
@@ -142,30 +118,6 @@ public class RawWrappedResponseTest
 		assertEquals(0, observer.getExceptionCount());
 //		System.out.println(httpResponse.toString());
 		assertEquals("\"Normal PUT action\"", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapPutInRawXml()
-	{
-		sendEvent(HttpMethod.PUT, "/normal_put.xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Normal PUT action</string>", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapPutInRawXmlUsingQueryString()
-	{
-		sendEvent(HttpMethod.PUT, "/normal_put?format=xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Normal PUT action</string>", httpResponse.toString());
 	}
 
 	@Test
@@ -193,30 +145,6 @@ public class RawWrappedResponseTest
 	}
 
 	@Test
-	public void shouldWrapPostInRawXml()
-	{
-		sendEvent(HttpMethod.POST, "/normal_post.xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Normal POST action</string>", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapPostInRawXmlUsingQueryString()
-	{
-		sendEvent(HttpMethod.POST, "/normal_post?format=xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Normal POST action</string>", httpResponse.toString());
-	}
-
-	@Test
 	public void shouldWrapDeleteInRawJson()
 	{
 		sendEvent(HttpMethod.DELETE, "/normal_delete.json", "");
@@ -238,30 +166,6 @@ public class RawWrappedResponseTest
 		assertEquals(0, observer.getExceptionCount());
 //		System.out.println(httpResponse.toString());
 		assertEquals("\"Normal DELETE action\"", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapDeleteInRawXml()
-	{
-		sendEvent(HttpMethod.DELETE, "/normal_delete.xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Normal DELETE action</string>", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapDeleteInRawXmlUsingQueryString()
-	{
-		sendEvent(HttpMethod.DELETE, "/normal_delete?format=xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Normal DELETE action</string>", httpResponse.toString());
 	}
 
 	@Test
@@ -289,30 +193,6 @@ public class RawWrappedResponseTest
 	}
 
 	@Test
-	public void shouldWrapNotFoundInRawXml()
-	{
-		sendEvent(HttpMethod.GET, "/not_found.xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(0, observer.getSuccessCount());
-		assertEquals(1, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Item not found</string>", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapNotFoundInRawXmlUsingQueryString()
-	{
-		sendEvent(HttpMethod.GET, "/not_found?format=xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(0, observer.getSuccessCount());
-		assertEquals(1, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Item not found</string>", httpResponse.toString());
-	}
-
-	@Test
 	public void shouldWrapNullPointerInRawJson()
 	{
 		sendEvent(HttpMethod.GET, "/null_pointer.json", "");
@@ -337,30 +217,6 @@ public class RawWrappedResponseTest
 	}
 
 	@Test
-	public void shouldWrapNullPointerInRawXml()
-	{
-		sendEvent(HttpMethod.GET, "/null_pointer.xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(0, observer.getSuccessCount());
-		assertEquals(1, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Null and void</string>", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapNullPointerInRawXmlUsingQueryString()
-	{
-		sendEvent(HttpMethod.GET, "/null_pointer?format=xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(0, observer.getSuccessCount());
-		assertEquals(1, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Null and void</string>", httpResponse.toString());
-	}
-
-	@Test
 	public void shouldWrapInvalidUrlWithRawJson()
 	{
 		sendEvent(HttpMethod.GET, "/xyzt.json", "");
@@ -382,30 +238,6 @@ public class RawWrappedResponseTest
 		assertEquals(1, observer.getExceptionCount());
 //		System.out.println(httpResponse.toString());
 		assertEquals("\"Unresolvable URL: http://null/xyzt?format=json\"", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapInvalidUrlWithRawXml()
-	{
-		sendEvent(HttpMethod.GET, "/xyzt.xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(0, observer.getSuccessCount());
-		assertEquals(1, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Unresolvable URL: http://null/xyzt.xml</string>", httpResponse.toString());
-	}
-
-	@Test
-	public void shouldWrapInvalidUrlWithXmlUsingQueryString()
-	{
-		sendEvent(HttpMethod.GET, "/xyzt?format=xml", "");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(0, observer.getSuccessCount());
-		assertEquals(1, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertEquals("<string>Unresolvable URL: http://null/xyzt?format=xml</string>", httpResponse.toString());
 	}
 
 	@Test

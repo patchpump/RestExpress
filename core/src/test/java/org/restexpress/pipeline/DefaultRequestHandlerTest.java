@@ -15,14 +15,14 @@
 */
 package org.restexpress.pipeline;
 
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.restexpress.ContentType;
@@ -39,16 +39,16 @@ import org.restexpress.route.RouteResolver;
 import org.restexpress.serialization.NullSerializationProvider;
 import org.restexpress.serialization.SerializationProvider;
 import org.restexpress.serialization.json.JacksonJsonProcessor;
-import org.restexpress.serialization.xml.XstreamXmlProcessor;
 import org.restexpress.settings.RouteDefaults;
 
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
 
 
 /**
@@ -71,7 +71,6 @@ public class DefaultRequestHandlerTest
 		SerializationProvider provider = new NullSerializationProvider();
 		provider.add(new JacksonJsonProcessor(Format.JSON), new RawResponseWrapper());
 		provider.add(new JacksonJsonProcessor(Format.WRAPPED_JSON), new JsendResponseWrapper());
-		provider.add(new XstreamXmlProcessor(Format.XML), new JsendResponseWrapper());
 		provider.alias("dated", Dated.class);
 		provider.setDefaultFormat(Format.WRAPPED_JSON);
 		
@@ -219,7 +218,6 @@ public class DefaultRequestHandlerTest
 		assertTrue(json.startsWith("{\"code\":400,\"status\":\"error\",\"message\":\"Requested representation format not supported: %target. Supported formats: "));
 		assertTrue(json.contains("json"));
 		assertTrue(json.contains("wjson"));
-		assertTrue(json.contains("xml"));
 		assertTrue(json.endsWith("\",\"data\":\"BadRequestException\"}"));
 	}
 
@@ -237,7 +235,6 @@ public class DefaultRequestHandlerTest
 		assertTrue(json.startsWith("{\"code\":400,\"status\":\"error\",\"message\":\"Requested representation format not supported: unsupported. Supported formats: "));
 		assertTrue(json.contains("json"));
 		assertTrue(json.contains("wjson"));
-		assertTrue(json.contains("xml"));
 		assertTrue(json.endsWith("\",\"data\":\"BadRequestException\"}"));
 	}
 
@@ -289,72 +286,6 @@ public class DefaultRequestHandlerTest
 		assertEquals(0, observer.getExceptionCount());
 //		System.out.println(httpResponse.toString());
 		assertEquals("{\"code\":200,\"status\":\"success\",\"data\":{\"at\":\"2010-12-17T12:00:00.000Z\"}}", responseBody.toString());
-	}
-
-	@Test
-	public void shouldParseTimepointXml()
-	{
-		sendGetEvent("/date.xml", "<org.restexpress.pipeline.Dated><at>2010-12-17T120000Z</at></org.restexpress.pipeline.Dated>");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertTrue(responseBody.toString().startsWith("<response>"));
-		assertTrue(responseBody.toString().contains("<code>200</code>"));
-		assertTrue(responseBody.toString().contains("<data class=\"dated\">"));
-		assertTrue(responseBody.toString().contains("<at>2010-12-17T12:00:00.000Z</at>"));
-		assertTrue(responseBody.toString().contains("</data>"));
-		assertTrue(responseBody.toString().endsWith("</response>"));
-	}
-
-	@Test
-	public void shouldParseTimepointXmlUsingQueryString()
-	{
-		sendGetEvent("/date?format=xml", "<dated><at>2010-12-17T120000Z</at></dated>");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(1, observer.getSuccessCount());
-		assertEquals(0, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertTrue(responseBody.toString().startsWith("<response>"));
-		assertTrue(responseBody.toString().contains("<code>200</code>"));
-		assertTrue(responseBody.toString().contains("<data class=\"dated\">"));
-		assertTrue(responseBody.toString().contains("<at>2010-12-17T12:00:00.000Z</at>"));
-		assertTrue(responseBody.toString().contains("</data>"));
-		assertTrue(responseBody.toString().endsWith("</response>"));
-	}
-
-	@Test
-	public void shouldThrowExceptionOnInvalidUrl()
-	{
-		sendGetEvent("/xyzt.xml");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(0, observer.getSuccessCount());
-		assertEquals(1, observer.getExceptionCount());
-//		System.out.println(responseBody.toString());
-		assertTrue(responseBody.toString().startsWith("<response>"));
-		assertTrue(responseBody.toString().contains("<code>404</code>"));
-		assertTrue(responseBody.toString().contains("<status>error</status>"));
-		assertTrue(responseBody.toString().contains("<message>Unresolvable URL: http://null/xyzt.xml</message>"));
-		assertTrue(responseBody.toString().endsWith("</response>"));
-	}
-
-	@Test
-	public void shouldThrowExceptionOnInvalidUrlWithXmlFormatQueryString()
-	{
-		sendGetEvent("/xyzt?format=xml");
-		assertEquals(1, observer.getReceivedCount());
-		assertEquals(1, observer.getCompleteCount());
-		assertEquals(0, observer.getSuccessCount());
-		assertEquals(1, observer.getExceptionCount());
-//		System.out.println(httpResponse.toString());
-		assertTrue(responseBody.toString().startsWith("<response>"));
-		assertTrue(responseBody.toString().contains("<code>404</code>"));
-		assertTrue(responseBody.toString().contains("<status>error</status>"));
-		assertTrue(responseBody.toString().contains("<message>Unresolvable URL: http://null/xyzt?format=xml</message>"));
-		assertTrue(responseBody.toString().endsWith("</response>"));
 	}
 
 	@Test

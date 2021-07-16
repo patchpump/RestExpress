@@ -17,7 +17,6 @@ package org.restexpress.serialization;
 
 import org.restexpress.response.JsendResponseWrapper;
 import org.restexpress.serialization.json.GsonJsonProcessor;
-import org.restexpress.serialization.xml.XstreamXmlProcessor;
 
 
 /**
@@ -33,6 +32,5 @@ extends AbstractSerializationProvider
     {
 		super();
 		add(new GsonJsonProcessor(), new JsendResponseWrapper(), true);
-		add(new XstreamXmlProcessor(), new JsendResponseWrapper());
     }
 }

@@ -41,7 +41,6 @@ import org.restexpress.response.ErrorResponseWrapper;
 import org.restexpress.serialization.AbstractSerializationProvider;
 import org.restexpress.serialization.NullSerializationProvider;
 import org.restexpress.serialization.json.JacksonJsonProcessor;
-import org.restexpress.serialization.xml.XstreamXmlProcessor;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
@@ -64,7 +63,6 @@ public class AltRestExpressServerTest
 	private static final String LITTLE_OS_PATH = "/littleos";
 	private static final String URL1_PLAIN = SERVER_HOST + URL_PATH1;
 	private static final String URL1_JSON = SERVER_HOST + URL_PATH1 + ".json";
-	private static final String URL1_XML = SERVER_HOST + URL_PATH1 + ".xml";
 	private static final String URL3_PLAIN = SERVER_HOST + URL_PATH3;
 	private static final String URL4_PLAIN = SERVER_HOST + URL_PATH4;
 	private static final String LITTLE_O_URL = SERVER_HOST + LITTLE_O_PATH;
@@ -82,11 +80,7 @@ public class AltRestExpressServerTest
 	{
 		JacksonJsonProcessor jackson = new JacksonJsonProcessor(Format.JSON);
 		jackson.addSupportedMediaTypes(ContentType.HAL_JSON);
-		DEFAULT_SERIALIZER.add(jackson, new ErrorResponseWrapper());
-
-		XstreamXmlProcessor xstream = new XstreamXmlProcessor(Format.XML);
-		xstream.addSupportedMediaTypes(ContentType.HAL_XML);
-		DEFAULT_SERIALIZER.add(xstream, new ErrorResponseWrapper());
+		DEFAULT_SERIALIZER.add(jackson, new ErrorResponseWrapper(), true);
 	}
 
 	private static RestExpress SERVER;
@@ -362,68 +356,6 @@ public class AltRestExpressServerTest
 	}
 
 	@Test
-	public void shouldReturnXmlUsingFormat() throws Exception
-	{
-		HttpGet request = new HttpGet(URL1_XML);
-
-		try
-		{
-			HttpResponse response = (HttpResponse) CLIENT.execute(request);
-			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
-			HttpEntity entity = response.getEntity();
-			assertTrue(entity.getContentLength() > 0l);
-			assertEquals(ContentType.XML, entity.getContentType().getValue());
-			assertEquals("<string>read</string>", EntityUtils.toString(entity));
-		}
-		finally
-		{
-			request.releaseConnection();
-		}
-	}
-
-	@Test
-	public void shouldReturnXmlUsingAccept() throws Exception
-	{
-		HttpGet request = new HttpGet(URL1_PLAIN);
-
-		try
-		{
-			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/xml");
-			HttpResponse response = (HttpResponse) CLIENT.execute(request);
-			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
-			HttpEntity entity = response.getEntity();
-			assertTrue(entity.getContentLength() > 0l);
-			assertEquals(ContentType.XML, entity.getContentType().getValue());
-			assertEquals("<string>read</string>", EntityUtils.toString(entity));
-		}
-		finally
-		{
-			request.releaseConnection();
-		}
-	}
-
-	@Test
-	public void shouldFavorFormatOverAcceptHeader() throws Exception
-	{
-		HttpGet request = new HttpGet(URL1_XML);
-
-		try
-		{
-			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/json");
-			HttpResponse response = (HttpResponse) CLIENT.execute(request);
-			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
-			HttpEntity entity = response.getEntity();
-			assertTrue(entity.getContentLength() > 0l);
-			assertEquals(ContentType.XML, entity.getContentType().getValue());
-			assertEquals("<string>read</string>", EntityUtils.toString(entity));
-		}
-		finally
-		{
-			request.releaseConnection();
-		}
-	}
-
-	@Test
 	public void shouldReturnJsonUsingFormat() throws Exception
 	{
 		HttpGet request = new HttpGet(URL1_JSON);
@@ -461,7 +393,6 @@ public class AltRestExpressServerTest
 			assertTrue(json.contains("\"httpStatus\":400"));
 			assertTrue(json.contains("\"message\":\"Requested representation format not supported: JSON. Supported formats: "));
 			assertTrue(json.contains("json"));
-			assertTrue(json.contains("xml"));
 			assertTrue(json.contains("\"errorType\":\"BadRequestException\""));
 		}
 		finally
@@ -507,7 +438,6 @@ public class AltRestExpressServerTest
 			assertTrue(json.contains("\"httpStatus\":400"));
 			assertTrue(json.contains("\"message\":\"Requested representation format not supported: xyz. Supported formats: "));
 			assertTrue(json.contains("json"));
-			assertTrue(json.contains("xml"));
 			assertTrue(json.contains("\"errorType\":\"BadRequestException\""));
 		}
 		finally
@@ -533,7 +463,7 @@ public class AltRestExpressServerTest
 			assertNotNull(json);
 			assertTrue(json.startsWith("{\"errorId\":"));
 			assertTrue(json.contains("\"httpStatus\":406"));
-			assertTrue(json.contains("\"message\":\"Supported Media Types: application/json; charset=UTF-8, application/javascript; charset=UTF-8, text/javascript; charset=UTF-8, application/hal+json; charset=UTF-8, application/xml; charset=UTF-8, text/xml; charset=UTF-8, application/hal+xml; charset=UTF-8\""));
+			assertTrue(json.contains("\"message\":\"Supported Media Types: application/json; charset=UTF-8, application/javascript; charset=UTF-8, text/javascript; charset=UTF-8, application/hal+json; charset=UTF-8\""));
 			assertTrue(json.contains("\"errorType\":\"NotAcceptableException\""));
 		}
 		finally
@@ -609,7 +539,7 @@ public class AltRestExpressServerTest
 			assertNotNull(json);
 			assertTrue(json.startsWith("{\"errorId\":"));
 			assertTrue(json.contains("\"httpStatus\":406"));
-			assertTrue(json.contains("\"message\":\"Supported Media Types: application/json; charset=UTF-8, application/javascript; charset=UTF-8, text/javascript; charset=UTF-8, application/hal+json; charset=UTF-8, application/xml; charset=UTF-8, text/xml; charset=UTF-8, application/hal+xml; charset=UTF-8\""));
+			assertTrue(json.contains("\"message\":\"Supported Media Types: application/json; charset=UTF-8, application/javascript; charset=UTF-8, text/javascript; charset=UTF-8, application/hal+json; charset=UTF-8\""));
 			assertTrue(json.contains("\"errorType\":\"NotAcceptableException\""));
 		}
 		finally
@@ -626,40 +556,7 @@ public class AltRestExpressServerTest
 		try
 		{
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
-			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
-			HttpEntity entity = response.getEntity();
-			assertTrue(entity.getContentLength() > 0l);
-			assertEquals(ContentType.XML, entity.getContentType().getValue());
-			LittleO o = DEFAULT_SERIALIZER.getSerializer(Format.XML).deserialize(
-			    EntityUtils.toString(entity), LittleO.class);
-			verifyObject(o);
-		}
-		finally
-		{
-			request.releaseConnection();
-		}
-	}
-
-	@Test
-	public void shouldSerializeListAsXml() throws Exception
-	{
-		HttpGet request = new HttpGet(LITTLE_OS_URL + ".xml");
-
-		try
-		{
-			HttpResponse response = (HttpResponse) CLIENT.execute(request);
-			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
-			HttpEntity entity = response.getEntity();
-			assertTrue(entity.getContentLength() > 0l);
-			assertEquals(ContentType.XML, entity.getContentType().getValue());
-			Header range = response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString());
-			assertNotNull(range);
-			assertEquals("items 0-2/3", range.getValue());
-			String entityString = EntityUtils.toString(entity);
-			@SuppressWarnings("unchecked")
-			List<LittleO> o = DEFAULT_SERIALIZER.getSerializer(Format.XML).deserialize(
-			    entityString, ArrayList.class);
-			verifyList(o.toArray(new LittleO[0]));
+			assertEquals(HttpResponseStatus.BAD_REQUEST.code(), response.getStatusLine().getStatusCode());
 		}
 		finally
 		{
@@ -702,16 +599,7 @@ public class AltRestExpressServerTest
 		{
 			request.addHeader(HttpHeaderNames.ACCEPT.toString(), "application/hal+xml");
 			HttpResponse response = (HttpResponse) CLIENT.execute(request);
-			assertEquals(HttpResponseStatus.OK.code(), response.getStatusLine().getStatusCode());
-			HttpEntity entity = response.getEntity();
-			assertTrue(entity.getContentLength() > 0l);
-			assertEquals(ContentType.HAL_XML, entity.getContentType().getValue());
-			Header range = response.getFirstHeader(HttpHeaderNames.CONTENT_RANGE.toString());
-			assertNotNull(range);
-			assertEquals("items 0-2/3", range.getValue());
-			String entityString = EntityUtils.toString(entity);
-			ArrayList<LittleO> os = DEFAULT_SERIALIZER.getSerializer(Format.XML).deserialize(entityString, ArrayList.class);
-			verifyList(os.toArray(new LittleO[0]));
+			assertEquals(HttpResponseStatus.NOT_ACCEPTABLE.code(), response.getStatusLine().getStatusCode());
 		}
 		finally
 		{

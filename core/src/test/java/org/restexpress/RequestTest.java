@@ -51,13 +51,13 @@ public class RequestTest
 	@Test
 	public void shouldRetrieveEntireUrl()
 	{
-		assertEquals("http://testing-host/foo?param1=bar&param2=blah&yada", request.getUrl());
+		assertEquals("https://testing-host/foo?param1=bar&param2=blah&yada", request.getUrl());
 	}
 
 	@Test
 	public void shouldRetrieveBaseUrl()
 	{
-		assertEquals("http://testing-host", request.getBaseUrl());
+		assertEquals("https://testing-host", request.getBaseUrl());
 	}
 
 	@Test

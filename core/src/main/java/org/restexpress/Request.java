@@ -444,12 +444,14 @@ public class Request
 	
 	/**
 	 * Returns the protocol and host (without the path) portion of the URL.
+	 * NOTE: Uses getScheme() which makes assumptions about the request
+	 * protocol (http vs. https) based on the hostname.
 	 * 
 	 * @return
 	 */
 	public String getBaseUrl()
 	{
-		return getProtocol() + "://" + getHost();
+		return getScheme() + "://" + getHost();
 	}
 
 	/**
@@ -552,12 +554,33 @@ public class Request
 
 	/**
 	 * Get the protocol of the request.
+	 * Note: Netty doesn't report this correctly--it will ALWAYS be 'http'
 	 * 
-	 * @return "http" or "https," etc. lower-case.
+	 * @return "http" in lower-case.
 	 */
 	public String getProtocol()
 	{
+		
 		return httpRequest.protocolVersion().protocolName().toLowerCase();
+	}
+
+	/**
+	 * Get the protocol of the request, making some assumptions based on the host.
+	 * 
+	 * Hosts of localhost and 127.0.0.1 return 'http'. All others return 'https'. 
+	 * 
+	 * @return "http" (for localhost and 127.0.01) or "https" for other hosts, in lower-case.
+	 */
+	public String getScheme()
+	{
+		String host = getHost();
+
+		if (host == null || host.startsWith("localhost") || host.startsWith("127.0.0.1"))
+		{
+			return "http";
+		}
+
+		return "https";
 	}
 	
 	/**

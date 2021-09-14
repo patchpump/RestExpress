@@ -90,6 +90,7 @@ Release 0.12.0-SNAPSHOT (in master)
 * Updated to compile with JDK 11 (use Base64 instead of DatatypeConverter in HttpBasicAuthenticationPreprocessor).
 * Added Environment.loadFromEnvVars(Properties) which loads System.getenv() to override the properties file settings. Values are available in fillValues(Properties).
 * Added JSON serialization and deserialization support for LocalDate as properties.
+* Added Request.getReferer() as well as changed getBaseUrl() to return referer if present on the request to enable using load balancers and proxies.
 
 Release 0.11.3 - 10 Feb 2016
 ----------------------------

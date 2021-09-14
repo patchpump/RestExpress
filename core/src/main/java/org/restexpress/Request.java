@@ -447,10 +447,21 @@ public class Request
 	 * NOTE: Uses getScheme() which makes assumptions about the request
 	 * protocol (http vs. https) based on the hostname.
 	 * 
+	 * If the request contains a referer header, it is used instead of host,
+	 * enabling the use of load balancers and proxies while maintaining the
+	 * anonymity of this service's IP address. 
+	 * 
 	 * @return
 	 */
 	public String getBaseUrl()
 	{
+		String referer = getReferer();
+
+		if (referer != null)
+		{
+			return getScheme() + "://" + referer;
+		}
+		
 		return getScheme() + "://" + getHost();
 	}
 
@@ -553,10 +564,21 @@ public class Request
 	}
 
 	/**
+	 * Get the referer header from the request.
+	 * 
+	 * @return the referer header (as a string) or null if not present on the request.
+	 */
+	public String getReferer()
+	{
+		return httpRequest.headers().get(HttpHeaderNames.REFERER);
+	}
+
+	/**
 	 * Get the protocol of the request.
 	 * Note: Netty doesn't report this correctly--it will ALWAYS be 'http'
 	 * 
 	 * @return "http" in lower-case.
+	 * @deprecated Use getScheme() which makes some attempt at figuring out https or http.
 	 */
 	public String getProtocol()
 	{

@@ -54,6 +54,8 @@ import io.netty.handler.codec.http.QueryStringDecoder;
  */
 public class Request
 {
+	private static final String URL_FORMAT = "%s://%s";
+
 	private static AtomicLong nextCorrelationId = new AtomicLong(0);
 
 
@@ -447,22 +449,22 @@ public class Request
 	 * NOTE: Uses getScheme() which makes assumptions about the request
 	 * protocol (http vs. https) based on the hostname.
 	 * 
-	 * If the request contains a referer header, it is used instead of host,
-	 * enabling the use of load balancers and proxies while maintaining the
-	 * anonymity of this service's IP address. 
+	 * If the request contains an X-Forwarded-Host header, it is used instead
+	 * of host, enabling the use of load balancers and proxies while maintaining
+	 * the anonymity of this service's IP address. 
 	 * 
 	 * @return
 	 */
 	public String getBaseUrl()
 	{
-		String referer = getReferer();
+		String forwardedHost = getXForwardedHost();
 
-		if (referer != null)
+		if (forwardedHost != null)
 		{
-			return getScheme() + "://" + referer;
+			return String.format(URL_FORMAT, getScheme(), forwardedHost);
 		}
 		
-		return getScheme() + "://" + getHost();
+		return String.format(URL_FORMAT, getScheme(), getHost());
 	}
 
 	/**
@@ -568,9 +570,9 @@ public class Request
 	 * 
 	 * @return the referer header (as a string) or null if not present on the request.
 	 */
-	public String getReferer()
+	public String getXForwardedHost()
 	{
-		return httpRequest.headers().get(HttpHeaderNames.REFERER);
+		return httpRequest.headers().get("X-Forwarded-Host");
 	}
 
 	/**

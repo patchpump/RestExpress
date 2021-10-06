@@ -78,7 +78,7 @@ Release 0.12.0-SNAPSHOT (in master)
 * **BREAKING CHANGE** Removed XML support. No more XStream!
 * **BREAKING CHANGE** Issue#140 - Use io.netty.handler.ssl.SslContext instead of java.net.ssl.SSLContext. Using SslUtil still works. Otherwise, use SslContextBuilder.
 * **BREAKING CHANGE** Issue#135 - Query-string parameter keys and values are URL decoded before putting them into the header and query-string maps.
-* **BREAKING CHANGE** Added Request.getXForwardedHost() as well as changed getBaseUrl() to return that instead of the HOST header if present on the request to enable using load balancers and proxies.
+* **BREAKING CHANGE** Changed getBaseUrl() to consider X-Forwarded-Host, Forwarded and HOST headers to enable constructing baseURL behind load balancers and proxies.
 * Issue #126 - Introduced RestExpress.noCompression() to turn off response GZip and deflate encoding support (the Netty HttpContentCompressor is not put in the pipeline) for speed optimization (e.g. for small payloads).
 * Issue #130 - Throw on BindException.
 * Issues #137-138 - Use char[] vs String in SslUtil (Merge request from albahrani).
@@ -91,6 +91,7 @@ Release 0.12.0-SNAPSHOT (in master)
 * Updated to compile with JDK 11 (use Base64 instead of DatatypeConverter in HttpBasicAuthenticationPreprocessor).
 * Added Environment.loadFromEnvVars(Properties) which loads System.getenv() to override the properties file settings. Values are available in fillValues(Properties).
 * Added JSON serialization and deserialization support for LocalDate as properties.
+* Added Request.getXForwardedHost() and getForwarded() as well as a Forwarded class to enable parsing the parameters in the Forwarded header.
 
 Release 0.11.3 - 10 Feb 2016
 ----------------------------

@@ -30,6 +30,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.restexpress.domain.Forwarded;
+import org.restexpress.domain.ForwardedParseError;
 import org.restexpress.exception.BadRequestException;
 import org.restexpress.pipeline.FileUploadHandler;
 import org.restexpress.route.Route;
@@ -457,14 +459,35 @@ public class Request
 	 */
 	public String getBaseUrl()
 	{
-		String forwardedHost = getXForwardedHost();
+		String host = getXForwardedHost();
+		String scheme = getScheme();
 
-		if (forwardedHost != null)
+		if (host == null)
 		{
-			return String.format(URL_FORMAT, getScheme(), forwardedHost);
+			try
+			{
+				Forwarded forwarded = Forwarded.parse(getForwarded());
+				host = forwarded.getHost();
+
+				if (forwarded.hasProto()) scheme = forwarded.getProto();
+			}
+			catch (ForwardedParseError e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		if (host == null)
+		{
+			host = getHost();
 		}
 		
-		return String.format(URL_FORMAT, getScheme(), getHost());
+		return String.format(URL_FORMAT, scheme, host);
+	}
+
+	public String getForwarded()
+	{
+		return httpRequest.headers().get("forwarded");
 	}
 
 	/**

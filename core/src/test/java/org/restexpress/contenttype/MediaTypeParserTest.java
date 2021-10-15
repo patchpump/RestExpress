@@ -23,8 +23,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Test;
-import org.restexpress.contenttype.MediaRange;
-import org.restexpress.contenttype.MediaTypeParser;
 
 /**
  * @author toddf
@@ -208,6 +206,14 @@ public class MediaTypeParserTest
 	{
 		List<MediaRange> supported = MediaTypeParser.parse("text/javascript, application/json, application/xml, text/xml");
 		List<MediaRange> requested = MediaTypeParser.parse("application/blah, text/plain");
+		assertNull(MediaTypeParser.getBestMatch(supported, requested));
+	}
+
+	@Test
+	public void shouldReturnNullWithComplexTypes()
+	{
+		List<MediaRange> supported = MediaTypeParser.parse("application/schema+json, application/vnd.avroschema+json, application/xml, text/xml, application/openapi");
+		List<MediaRange> requested = MediaTypeParser.parse("application/json;charset=UTF-8");
 		assertNull(MediaTypeParser.getBestMatch(supported, requested));
 	}
 }

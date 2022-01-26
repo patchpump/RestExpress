@@ -20,9 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.netty.handler.codec.http.HttpMethod;
 import org.restexpress.route.Route;
 import org.restexpress.url.UrlRegex;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * @author toddf

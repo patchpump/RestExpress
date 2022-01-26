@@ -18,11 +18,12 @@ package org.restexpress.serialization.json;
 import java.io.IOException;
 import java.time.LocalDate;
 
+import org.restexpress.common.util.localdate.LocalDateAdapter;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.strategicgains.util.localdate.LocalDateAdapter;
 
 /**
  * @author toddf

@@ -21,12 +21,13 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.time.LocalDate;
 
+import org.restexpress.common.util.localdate.LocalDateAdapter;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
-import com.strategicgains.util.localdate.LocalDateAdapter;
 
 /**
  * A GSON serializer for Date instances represented (and to be presented) as a date (without time component).

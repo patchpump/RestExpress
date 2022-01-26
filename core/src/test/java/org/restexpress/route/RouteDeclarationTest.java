@@ -8,15 +8,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import io.netty.handler.codec.http.HttpMethod;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restexpress.Request;
 import org.restexpress.Response;
-import org.restexpress.route.Route;
-import org.restexpress.route.RouteDeclaration;
-import org.restexpress.route.RouteMapping;
 import org.restexpress.settings.RouteDefaults;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * @author toddf

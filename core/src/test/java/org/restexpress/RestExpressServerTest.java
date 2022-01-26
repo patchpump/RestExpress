@@ -33,7 +33,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.restexpress.common.query.QueryRange;
-import org.restexpress.domain.JsendResultWrapper;
 import org.restexpress.pipeline.SimpleConsoleLogMessageObserver;
 import org.restexpress.response.JsendResponseWrapper;
 import org.restexpress.serialization.AbstractSerializationProvider;

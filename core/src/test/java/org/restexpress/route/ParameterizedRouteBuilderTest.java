@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.restexpress.Format;
 import org.restexpress.Request;
 import org.restexpress.Response;
-import org.restexpress.route.Route;
 import org.restexpress.route.parameterized.ParameterizedRouteBuilder;
 import org.restexpress.settings.RouteDefaults;
 

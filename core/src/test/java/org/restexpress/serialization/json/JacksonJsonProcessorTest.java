@@ -24,12 +24,13 @@ import static org.junit.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.junit.Test;
 import org.restexpress.ContentType;
 import org.restexpress.serialization.KnownObject;
 import org.restexpress.serialization.SerializationProcessor;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 /**
  * @author toddf

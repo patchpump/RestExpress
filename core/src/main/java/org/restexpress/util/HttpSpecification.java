@@ -19,9 +19,10 @@ import static io.netty.handler.codec.http.HttpHeaderNames.ALLOW;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.restexpress.Response;
 import org.restexpress.exception.HttpSpecificationException;
+
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * Verifies the response contents prior to writing it to the output stream to

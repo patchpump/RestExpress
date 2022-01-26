@@ -3,13 +3,13 @@ package org.restexpress.route;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import io.netty.handler.codec.http.HttpMethod;
 import org.junit.Test;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.RestExpress;
 import org.restexpress.domain.metadata.RouteMetadata;
-import org.restexpress.route.RouteBuilder;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 public class RouteBuilderTest
 {

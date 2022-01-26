@@ -17,10 +17,11 @@ package org.restexpress.serialization;
 
 import java.nio.ByteBuffer;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.response.ResponseProcessor;
+
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 /**
  * Contains the Media-Type and a reference to the appropriate {@link ResponseProcessor}

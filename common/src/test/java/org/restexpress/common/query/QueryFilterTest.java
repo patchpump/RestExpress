@@ -20,10 +20,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.restexpress.common.query.FilterCallback;
-import org.restexpress.common.query.FilterComponent;
-import org.restexpress.common.query.FilterOperator;
-import org.restexpress.common.query.QueryFilter;
 
 /**
  * @author toddf

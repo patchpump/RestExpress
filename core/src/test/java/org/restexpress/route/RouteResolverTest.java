@@ -21,22 +21,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.DefaultHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpVersion;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.exception.MethodNotAllowedException;
-import org.restexpress.route.Action;
-import org.restexpress.route.RouteDeclaration;
-import org.restexpress.route.RouteMapping;
-import org.restexpress.route.RouteResolver;
 import org.restexpress.settings.RouteDefaults;
+
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * @author toddf

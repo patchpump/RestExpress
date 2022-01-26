@@ -18,12 +18,13 @@ package org.restexpress.serialization.json;
 import java.io.IOException;
 import java.util.Date;
 
+import org.restexpress.common.util.date.DateAdapter;
+import org.restexpress.common.util.date.TimestampAdapter;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.strategicgains.util.date.DateAdapter;
-import com.strategicgains.util.date.TimestampAdapter;
 
 /**
  * @author toddf

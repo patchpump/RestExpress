@@ -20,8 +20,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 
 import java.nio.ByteBuffer;
 import java.util.Calendar;
@@ -32,6 +30,9 @@ import org.junit.Test;
 import org.restexpress.ContentType;
 import org.restexpress.serialization.KnownObject;
 import org.restexpress.serialization.SerializationProcessor;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 /**
  * @author toddf

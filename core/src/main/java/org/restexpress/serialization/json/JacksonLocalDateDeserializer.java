@@ -19,13 +19,13 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
 
+import org.restexpress.common.util.localdate.LocalDateAdapter;
 import org.restexpress.serialization.DeserializationException;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.strategicgains.util.localdate.LocalDateAdapter;
 
 /**
  * @author toddf

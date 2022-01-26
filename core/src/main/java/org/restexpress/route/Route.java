@@ -27,13 +27,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.netty.handler.codec.http.HttpMethod;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.common.util.StringUtils;
 import org.restexpress.exception.ServiceException;
 import org.restexpress.url.UrlMatch;
 import org.restexpress.url.UrlMatcher;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 
 /**

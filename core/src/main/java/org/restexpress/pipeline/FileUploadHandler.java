@@ -27,7 +27,6 @@ import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.exception.DefaultExceptionMapper;
 import org.restexpress.exception.ExceptionMapping;
-import org.restexpress.exception.ServiceException;
 import org.restexpress.response.HttpResponseWriter;
 import org.restexpress.route.Action;
 import org.restexpress.route.RouteResolver;

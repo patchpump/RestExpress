@@ -17,11 +17,12 @@ package org.restexpress.route;
 
 import java.util.List;
 
-import io.netty.handler.codec.http.HttpMethod;
 import org.restexpress.Request;
 import org.restexpress.exception.MethodNotAllowedException;
 import org.restexpress.exception.NotFoundException;
 import org.restexpress.util.Resolver;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * @author toddf

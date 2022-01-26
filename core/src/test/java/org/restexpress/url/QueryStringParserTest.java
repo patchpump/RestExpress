@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import io.netty.handler.codec.http.QueryStringDecoder;
 import org.junit.Assert;
 import org.junit.Test;
-import org.restexpress.url.QueryStringParser;
+
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 /**
  * Copied from Netty's QueryStringDecoderTest and modified to test QueryStringParser,

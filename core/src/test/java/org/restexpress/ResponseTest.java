@@ -17,9 +17,10 @@ package org.restexpress;
 
 import static org.junit.Assert.assertEquals;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import org.junit.Test;
 import org.restexpress.common.query.QueryRange;
+
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 /**
  * @author toddf

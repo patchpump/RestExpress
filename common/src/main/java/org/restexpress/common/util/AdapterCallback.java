@@ -15,21 +15,13 @@
  * limitations under the License.
  */
 
-package org.restexpress.serialization.json;
-
-import org.restexpress.common.util.date.TimestampAdapter;
+package org.restexpress.common.util;
 
 /**
- * A GSON serializer for Date instances represented (and to be presented) as a timestamps (dates with time component).
- * 
- * @author toddf
- * @since Nov 13, 2009
+ * @author Todd Fredrich
+ * @since April 7, 2010
  */
-public class GsonTimepointSerializer
-extends GsonDateSerializer
+public interface AdapterCallback<T>
 {
-	public GsonTimepointSerializer()
-	{
-		super(new TimestampAdapter());
-	}
+	public T process(T object);
 }

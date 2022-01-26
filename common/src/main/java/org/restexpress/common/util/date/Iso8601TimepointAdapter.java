@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Strategic Gains, Inc.
+ * Copyright 2010, Strategic Gains, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package org.restexpress.serialization.json;
+package org.restexpress.common.util.date;
 
-import org.restexpress.common.util.date.TimestampAdapter;
 
 /**
- * A GSON serializer for Date instances represented (and to be presented) as a timestamps (dates with time component).
+ * Utilizes the {@link Iso8601TimepointCallback} to implement ISO 8601 time point parsing and formatting.
  * 
  * @author toddf
  * @since Nov 13, 2009
  */
-public class GsonTimepointSerializer
-extends GsonDateSerializer
+public class Iso8601TimepointAdapter
+extends DateAdapter
 {
-	public GsonTimepointSerializer()
+	public Iso8601TimepointAdapter()
 	{
-		super(new TimestampAdapter());
+		super(DateAdapterConstants.TIME_POINT_OUTPUT_FORMAT, DateAdapterConstants.TIMESTAMP_INPUT_FORMATS);
+		setPreParseCallback(new Iso8601TimepointCallback());
 	}
 }

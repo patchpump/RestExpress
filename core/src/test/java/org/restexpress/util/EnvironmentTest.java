@@ -15,7 +15,7 @@
 */
 package org.restexpress.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.FileNotFoundException;
@@ -46,24 +46,5 @@ public class EnvironmentTest
 		assertNotNull(e);
 		String cp = e.getPath();
 		assertNotNull(cp);
-	}
-
-	@Test
-	public void shouldAttemptLoadingFromFileSystem()
-	throws IOException
-	{
-		try
-		{
-			Environment.from("prod", TestConfig.class);
-		}
-		catch(FileNotFoundException e)
-		{
-			if(e.getMessage().contains("config/prod/environment.properties")) return;
-			else
-			{
-				fail("Did not throw appropriate error: " + e.getMessage());
-			}
-		}
-
 	}
 }

@@ -20,13 +20,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map.Entry;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.restexpress.ContentType;
 import org.restexpress.Parameters;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.route.Action;
 import org.restexpress.serialization.SerializationSettings;
+
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * @author toddf

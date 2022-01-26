@@ -22,8 +22,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.netty.handler.codec.http.HttpMethod;
 import org.restexpress.url.UrlMatch;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * Contains the routes for a given service implementation. Sub-classes will

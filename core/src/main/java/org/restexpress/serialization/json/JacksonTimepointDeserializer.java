@@ -19,14 +19,14 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
+import org.restexpress.common.util.date.DateAdapter;
+import org.restexpress.common.util.date.Iso8601TimepointAdapter;
 import org.restexpress.serialization.DeserializationException;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.strategicgains.util.date.DateAdapter;
-import com.strategicgains.util.date.Iso8601TimepointAdapter;
 
 /**
  * @author toddf

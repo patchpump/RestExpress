@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.restexpress.common.exception.ConfigurationException;
@@ -31,6 +30,8 @@ import org.restexpress.exception.BadRequestException;
 import org.restexpress.exception.NotAcceptableException;
 import org.restexpress.response.ResponseProcessor;
 import org.restexpress.response.ResponseWrapper;
+
+import io.netty.handler.codec.http.HttpHeaderNames;
 
 /**
  * @author toddf

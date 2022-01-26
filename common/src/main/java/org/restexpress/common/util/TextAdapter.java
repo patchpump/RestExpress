@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-package org.restexpress.serialization.json;
+package org.restexpress.common.util;
 
-import org.restexpress.common.util.date.TimestampAdapter;
+import java.text.ParseException;
 
 /**
- * A GSON serializer for Date instances represented (and to be presented) as a timestamps (dates with time component).
+ * Defines an interface to convert an object to a text string and back.
  * 
  * @author toddf
  * @since Nov 13, 2009
  */
-public class GsonTimepointSerializer
-extends GsonDateSerializer
+public interface TextAdapter<T>
 {
-	public GsonTimepointSerializer()
-	{
-		super(new TimestampAdapter());
-	}
+	public T parse(String value)
+	throws ParseException;
+	
+	public String format(T value);
 }

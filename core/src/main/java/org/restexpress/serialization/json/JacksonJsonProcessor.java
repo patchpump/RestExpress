@@ -28,6 +28,7 @@ import java.util.Date;
 import org.restexpress.ContentType;
 import org.restexpress.Format;
 import org.restexpress.common.util.StringUtils;
+import org.restexpress.common.util.date.DateAdapterConstants;
 import org.restexpress.serialization.DeserializationException;
 import org.restexpress.serialization.SerializationException;
 
@@ -39,7 +40,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.strategicgains.util.date.DateAdapterConstants;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -166,10 +166,6 @@ extends JsonSerializationProcessor
 			return (string == null || string.trim().isEmpty() ? null : mapper.readValue(string, type));
 		}
 		catch (JsonProcessingException e)
-		{
-			throw new DeserializationException(e);
-		}
-		catch (IOException e)
 		{
 			throw new DeserializationException(e);
 		}

@@ -18,10 +18,6 @@ package org.restexpress.query;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +30,11 @@ import org.restexpress.common.query.FilterComponent;
 import org.restexpress.common.query.FilterOperator;
 import org.restexpress.common.query.QueryFilter;
 import org.restexpress.exception.BadRequestException;
+
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * @author toddf

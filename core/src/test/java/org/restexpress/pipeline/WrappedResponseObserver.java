@@ -17,7 +17,6 @@ package org.restexpress.pipeline;
 
 import org.restexpress.Request;
 import org.restexpress.Response;
-import org.restexpress.pipeline.MessageObserver;
 
 /**
  * @author toddf

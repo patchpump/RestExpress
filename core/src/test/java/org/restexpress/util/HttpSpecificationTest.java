@@ -18,13 +18,14 @@ package org.restexpress.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.restexpress.ContentType;
 import org.restexpress.Response;
 import org.restexpress.exception.HttpSpecificationException;
+
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * @author toddf

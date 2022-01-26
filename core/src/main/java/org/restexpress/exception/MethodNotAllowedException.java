@@ -18,11 +18,12 @@ package org.restexpress.exception;
 import java.util.Collections;
 import java.util.List;
 
+import org.restexpress.Response;
+import org.restexpress.common.util.StringUtils;
+
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import org.restexpress.Response;
-import org.restexpress.common.util.StringUtils;
 
 /**
  * @author toddf

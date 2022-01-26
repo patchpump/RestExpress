@@ -24,11 +24,11 @@ import java.util.Date;
 
 import org.restexpress.ContentType;
 import org.restexpress.common.util.StringUtils;
+import org.restexpress.common.util.date.DateAdapterConstants;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.strategicgains.util.date.DateAdapterConstants;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;

@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.restexpress.Response;
-import org.restexpress.domain.JsendResultWrapper;
 import org.restexpress.exception.ServiceException;
 
 

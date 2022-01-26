@@ -5,6 +5,13 @@ package org.restexpress.response;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
+
+import org.restexpress.ContentType;
+import org.restexpress.Parameters;
+import org.restexpress.Request;
+import org.restexpress.Response;
+import org.restexpress.util.HttpSpecification;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -14,12 +21,6 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import org.restexpress.ContentType;
-import org.restexpress.Parameters;
-import org.restexpress.Request;
-import org.restexpress.Response;
-import org.restexpress.util.HttpSpecification;
 
 /**
  * @author toddf
